@@ -10,7 +10,7 @@
     <meta name="Author" content="TZDeveloper">
     <meta name="keywords" content="admin, mobil, car, bekas, shop, jual-beli, sell, reporting, cms">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{ asset('assets/images/brand-logos/favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('assets/images/brand-logos/logo.jpg') }}" type="image/x-icon">
     <link id="style" href="{{ asset('assets/libs/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/styles.css?v=') . time() }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet" />
@@ -43,8 +43,9 @@
                             <div class="col-md-10 col-lg-10 col-xl-9 mx-auto">
                                 <div class="card-sigin">
                                     <div class="mb-5 d-flex">
-                                        <a href="index.html" class="header-logo"><img src="../assets/images/brand-logos/desktop-logo.png" class="desktop-logo ht-40" alt="logo">
-                                            <img src="../assets/images/brand-logos/desktop-white.png" class="desktop-white ht-40" alt="logo">
+                                        <a href="index.html" class="header-logo">
+                                            <img src="{{ asset('assets/images/brand-logos/logo-long.jpg') }}" class="desktop-logo ht-40" alt="logo">
+                                            <img src="{{ asset('assets/images/brand-logos/logo-long.jpg') }}" class="desktop-white ht-40" alt="logo">
                                         </a>
                                     </div>
                                     <div class="card-sigin">
