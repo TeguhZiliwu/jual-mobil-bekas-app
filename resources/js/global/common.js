@@ -398,9 +398,7 @@ const signOut = async () => {
         if (success) {
             showAlert("success", message, 15000);
             localStorage.clear();
-            window.setTimeout(function () { 
-                window.location.href = `/signin`;
-            }, 1000);
+            window.location.href = `/signin`;
         }
         else {
             showAlert(message_type, message);

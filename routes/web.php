@@ -43,26 +43,14 @@ Route::middleware([Authenticate::class])->group(function () {
             return view('pages.masters.brand');
         })->name('master.brand');
     
-        Route::get('/unit-of-measurement', function () {
-            return view('pages.masters.unit-of-measurement');
-        })->name('master.unit-of-measurement');
-    
         Route::get('/item', function () {
             return view('pages.masters.item');
         })->name('master.item');
-    
-        Route::get('/supplier', function () {
-            return view('pages.masters.supplier');
-        })->name('master.supplier');
-    
-        Route::get('/supplier-contact', function () {
-            return view('pages.masters.supplier-contact');
-        })->name('master.supplier-contact');
     });
     
     Route::group(['prefix' => 'transaction'], function () {
-        Route::get('/stock-in', function () {
-            return view('pages.transactions.stock-in');
-        })->name('transaction.stock-in');
+        Route::get('/car-for-sale', function () {
+            return view('pages.transactions.car-for-sale');
+        })->name('transaction.car-for-sale');
     });
 });

@@ -171,3 +171,24 @@ table.dataTable thead th.action-column {
 .table-no {
     width: 50px;
 }
+
+.product-sale {
+    z-index: 999;
+}
+
+.adtocart {
+    inset-inline-start: 43%;
+}
+
+.carousel-indicators {
+    margin-bottom: 2rem;
+}
+
+.adtocart i {
+    position: absolute;
+    left: 6px;
+}
+
+.no-found-car {
+    width: 200px;
+}

@@ -26,7 +26,7 @@ $(document).ready(function () {
     var url = window.location;
     var pathName = url.pathname.toLowerCase();
     const href = url.href.toLowerCase();
-    console.log(`${window.location.origin}${pathName}`)
+    
     $('ul.main-menu li.slide a[href="' + href + '"]').addClass('active');
     $('ul.main-menu li.slide a').filter(function () {
         return this.href.toLowerCase() == `${href}`;

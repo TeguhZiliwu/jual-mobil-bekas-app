@@ -64,6 +64,12 @@
                 @endif
                 @if (auth()->check() && auth()->user()->role === 'User')
                 <li class="slide">
+                    <a href="{{ route('transaction.car-for-sale') }}" class="side-menu__item">
+                        <i class="side-menu__icon fa-solid fa-cars"></i>
+                        <span class="side-menu__label">Cars for Sale</span>
+                    </a>
+                </li>
+                <li class="slide">
                     <a href="javascript:void(0);" class="side-menu__item">
                         <i class="side-menu__icon fa-solid fa-cart-shopping"></i>
                         <span class="side-menu__label">Cart</span>

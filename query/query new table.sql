@@ -41,7 +41,6 @@ CREATE TABLE IF NOT EXISTS items (
     updated_by VARCHAR(50) NULL,
     updated_at DATETIME NULL,
 	PRIMARY KEY (id),
-    UNIQUE (brand_id, name),
 	FOREIGN KEY (brand_id) REFERENCES brands(id)
 );
 

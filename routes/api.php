@@ -64,7 +64,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create', [ItemController::class, 'create']);
         Route::post('/update', [ItemController::class, 'update']);
         Route::delete('/delete', [ItemController::class, 'delete']);
-        Route::get('/scan', [ItemController::class, 'scan_item']);
+        Route::get('/photo', [ItemController::class, 'get_photo']);
+        Route::get('/car-for-sale', [ItemController::class, 'get_car_for_sale']);
     });
 
     Route::group(['prefix' => 'supplier'], function () {

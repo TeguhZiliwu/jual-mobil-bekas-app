@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Master;
 
 use App\Http\Controllers\API\BaseController;
 use App\Models\Master\Item;
+use App\Models\Master\ItemPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +32,40 @@ class ItemController extends BaseController
         }
     }
 
+    //show
+    public function get_car_for_sale(Request $request)
+    {
+        try {
+            $request_data = $request->only('brand_id', 'fuel_type', 'seat_type', 'keyword');
+
+            $result = DB::table("items AS A")->select('A.id', 'A.brand_id', 'D.name AS brand_name', 'A.status', 'A.name', 'A.description', 'A.cc', 'A.fuel_type', 'A.total_seat', 'A.price')->leftJoin('users AS B', 'A.created_by', '=', 'B.userid')->leftJoin('users AS C', 'A.updated_by', '=', 'C.userid')->join('brands AS D', 'A.brand_id', '=', 'D.id')->where('status', 'OPEN')->where(function ($query) use ($request_data) {
+                $brand_id = $request_data['brand_id'];
+                $fuel_type = $request_data['fuel_type'];
+                $seat_type = $request_data['seat_type'];
+                if ($brand_id != '') {
+                    $query->where('A.brand_id', $brand_id);
+                }
+                if ($fuel_type != '') {
+                    $query->where('A.fuel_type', $fuel_type);
+                }
+                if ($seat_type != '') {
+                    $query->where('A.total_seat', $seat_type);
+                }
+            })->where(function ($query) use ($request_data) {
+                $keyword = $request_data['keyword'];
+                $query->where('A.name', 'like', '%' . $keyword . '%')
+                    ->orWhere('A.fuel_type', 'like', '%' . $keyword . '%')
+                    ->orWhere(DB::raw("CONCAT(A.total_seat, ' Seats')"), 'like', '%' . $keyword . '%')
+                    ->orWhere('A.description', 'like', '%' . $keyword . '%')
+                    ->orWhere('D.name', 'like', '%' . $keyword . '%');
+            })->get();
+
+            return $this->sendResponse($result, 'Data retrieved successfully.');
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
     //create
     public function create(Request $request)
     {
@@ -38,7 +73,7 @@ class ItemController extends BaseController
             $auth_user = Auth::user();
             $request_data = $request->only('brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'price');
             $final_field = $request_data;
-            
+
             $validator = Validator::make($request_data, [
                 'brand_id' => 'required|exists:brands,id',
                 'name' => 'required|max:100|unique:items,name,' . $request->name,
@@ -48,13 +83,8 @@ class ItemController extends BaseController
                 'total_seat' => 'required|integer',
                 'price' => 'required|regex:/^\d{1,15}(\.\d{1,3})?$/'
             ]);
-            
-            if ($request->hasFile('photo')) {
-                // $fileName = $code . "." . $request->photo->getClientOriginalExtension();
-                // $request->photo->move(public_path('assets/images/items/'), $fileName);
-                // $final_field["photo"] = $fileName;
-            }
-            
+
+
             $final_field['status'] = 'OPEN';
             $final_field['created_by'] = $auth_user->userid;
             $final_field['created_at'] = now();
@@ -65,13 +95,37 @@ class ItemController extends BaseController
                 $validation_message = $validator->errors();
                 return $this->sendResponse(null, $message, false, $message_type, $validation_message);
             }
-            // if ($request->hasFile('photo')) {
-            //     $fileName = time() . '_' . $request->user_id . "." . $request->photo->getClientOriginalExtension();
-            //     $request->photo->move(public_path('assets/images/profile'), $fileName);
-            //     $createdField["photo"] = $fileName;
-            // }
 
-            $result = (bool) Item::create($final_field);
+            $item = Item::create($final_field);
+
+            // Check if the record was recently created
+            $result = $item->wasRecentlyCreated;
+            
+            if ($request->hasFile('photo')) {
+                $allowedfileExtension = ['jpeg','jpg','png'];
+                $files = $request->file('photo');
+                foreach ($files as $index => $file) {
+                    
+                    $filename = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+                    $uniqid = uniqid();
+                    $finalName = "{$request->name}_{$uniqid}.{$extension}";
+                    $check = in_array($extension, $allowedfileExtension);
+
+                    if (!$check) {
+                        $validationPhoto = false;
+                    } else {
+                        $file->move(public_path('assets/images/items/'), $finalName);
+                        $result = (bool) ItemPhoto::create([
+                            'item_id' => $item->id,
+                            'name' => $finalName,
+                            'created_by' =>  $auth_user->userid,
+                            'created_at' => now()
+                        ]);
+                    }
+                }
+            }
+
             $message = $result ? 'Submit data successfully!' : 'Something wrong when submitting the data! Please contact the administrator!';
 
             return $this->sendResponse($result, $message);
@@ -85,22 +139,24 @@ class ItemController extends BaseController
     {
         try {
             $auth_user = Auth::user();
-            $request_data = $request->only('id', 'brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'price');
+            $request_data = $request->only('id', 'brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'price', 'photo', 'photo_removed');
             $final_field = $request_data;
             $ruleValidation = [
                 'id' => 'required|exists:items,id',
-                'name' => 'required|max:100|unique:items,name,' . $request->id. ',id',
+                'name' => 'required|max:100|unique:items,name,' . $request->id . ',id',
                 'description' => 'required|max:100',
                 'brand_id' => 'required|exists:brands,id',
                 'cc' => 'required|regex:/^\d{1,8}(\.\d{1,2})?$/',
                 'price' => 'required|regex:/^\d{1,15}(\.\d{1,3})?$/',
                 'fuel_type' => 'required|max:100',
+                'photo_removed' => 'nullable|array',
+                'photo_removed.*' => 'nullable|string',
                 'total_seat' => 'required|integer'
             ];
-            
+
             // $requestFile = $request->file('photo')->getClientOriginalName();
             // $requestFileName = pathinfo($requestFile, PATHINFO_FILENAME) . '.' . $request->photo->getClientOriginalExtension();
-            
+
             // $exisitingPhotoName = Item::where('code', $request->code)->value('photo');
             // $oldImage = public_path('assets/images/items/') . $exisitingPhotoName;
 
@@ -109,27 +165,60 @@ class ItemController extends BaseController
             //         File::delete($oldImage);
             //     }
             // }
-            
-            // if ($request->hasFile('photo')) {                
-            //     if ($request->photo->getClientOriginalExtension() != "") {
-            //         $fileName = $request->code . "." . $request->photo->getClientOriginalExtension();
-            //         $request->photo->move(public_path('assets/images/items/'), $fileName);
-            //         $final_field["photo"] = $fileName;
-            //     }
-            // } else {
-            //     $final_field['photo'] = null;
-            // }
+
+            $validator = Validator::make($request_data, $ruleValidation);
+            $validationPhoto = true;
+
+            unset($final_field['photo']);
+            unset($final_field['photo_removed']);
+            if ($request->hasFile('photo')) {
+                $allowedfileExtension = ['jpeg','jpg','png'];
+                $files = $request->file('photo');
+                foreach ($files as $index => $file) {
+                    
+                    $filename = $file->getClientOriginalName();
+                    $extension = $file->getClientOriginalExtension();
+
+                    if ($extension != "") {
+                        $uniqid = uniqid();
+                        $finalName = "{$request->name}_{$uniqid}.{$extension}";
+                        $check = in_array($extension, $allowedfileExtension);
+    
+                        if (!$check) {
+                            $validationPhoto = false;
+                        } else {
+                            $file->move(public_path('assets/images/items/'), $finalName);
+                            $result = (bool) ItemPhoto::create([
+                                'item_id' => $request->id,
+                                'name' => $finalName,
+                                'created_by' =>  $auth_user->userid,
+                                'created_at' => now()
+                            ]);
+                        }
+                    }
+                }
+            }
 
             $final_field['updated_by'] = $auth_user->userid;
             $final_field['updated_at'] = now();
 
-            $validator = Validator::make($request_data, $ruleValidation);
-
-            if ($validator->fails()) {
+            if ($validator->fails() || !$validationPhoto) {
                 $message = 'Invalid data provided. Please review and try again.';
                 $message_type = 'warning';
                 $validation_message = $validator->errors();
                 return $this->sendResponse(null, $message, false, $message_type, $validation_message);
+            }
+
+            if ($request->has('photo_removed') && is_array($request->photo_removed) && !empty($request->photo_removed)) {
+                foreach ($request->photo_removed as $index => $photo) {
+                    $filePath = 'assets/images/items/' . $photo;
+                    $result = (bool) ItemPhoto::where('item_id', $request_data["id"])->where('name', $photo)->delete();
+    
+                    if (File::exists($filePath)) {
+                        // Delete the file
+                        File::delete($filePath);
+                    }
+                }
             }
 
             $result = (bool) Item::where('id', $request->id)->update($final_field);
@@ -150,7 +239,7 @@ class ItemController extends BaseController
             $validator = Validator::make($request_data, [
                 'id' => 'required|max:20|exists:items,id',
             ]);
-            
+
             if ($validator->fails()) {
                 $message = 'Invalid data provided. Please review and try again.';
                 $message_type = 'warning';
@@ -162,6 +251,31 @@ class ItemController extends BaseController
             $message = $result ? 'Delete data successfully!' : 'Something wrong when deleting the data! Please contact the administrator!';
 
             return $this->sendResponse($result, $message);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    
+    //delete
+    public function get_photo(Request $request)
+    {
+        try {
+            $request_data = $request->only('id');
+
+            $validator = Validator::make($request_data, [
+                'id' => 'required|max:20|exists:items,id',
+            ]);
+
+            if ($validator->fails()) {
+                $message = 'Invalid data provided. Please review and try again.';
+                $message_type = 'warning';
+                $validation_message = $validator->errors();
+                return $this->sendResponse(null, $message, false, $message_type, $validation_message);
+            }
+            
+            $result = ItemPhoto::where('item_id', $request_data["id"])->get();
+
+            return $this->sendResponse($result, 'Data retrieved successfully.');
         } catch (\Throwable $th) {
             throw $th;
         }

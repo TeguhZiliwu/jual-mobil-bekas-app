@@ -15,6 +15,8 @@ export default defineConfig({
                 'resources/js/pages/masters/user.js',
                 'resources/js/pages/masters/brand.js',
                 'resources/js/pages/masters/item.js',
+                'resources/js/pages/transactions/car-for-sale.js',
+
                 'resources/js/pages/masters/unit-of-measurement.js',
                 'resources/js/pages/masters/supplier.js',
                 'resources/js/pages/masters/supplier-contact.js',

@@ -6,6 +6,7 @@ let imageFile;
 let mainTable;
 let isEdit = false;
 let selectedId = "";
+let photoRemoved = [];
 
 const disableForm = (isDisable) => {
     try {
@@ -32,6 +33,9 @@ const clearForm = () => {
         $(`#ddDiscountType`).val("").trigger("change");
         selectedId = "";
         imageFile.removeFiles();
+        window.setTimeout(function () {
+            photoRemoved = [];
+        }, 300);
         isEdit = false;
     } catch (error) {
         showError(error);
@@ -201,17 +205,43 @@ const generateMainTable = () => {
 
 const getBrand = async () => {
     try {
-        try {
-            const url = "/api/brand/list";
-            const target = $("#ddBrand");
+        const url = "/api/brand/list";
+        const target = $("#ddBrand");
 
-            await generateDropdownOption(url, null, target);
-        } catch (e) {
-            showError(e);
+        await generateDropdownOption(url, null, target);
+
+    } catch (e) {
+        showError(e);
+    }
+};
+
+const getPhoto = async (id) => {
+    try {
+        const url = "/api/item/photo";
+
+        const param = {
+            id
+        };
+
+        showLoading();
+        const response = await callAPI(url, "GET", param);
+        const { data, success, message, message_type } = await response;
+
+        if (success) {
+            for (let i = 0; i < data.length; i++) {
+                const { name } = data[i];
+                imageFile.addFiles(`../assets/images/items/${name}`);
+            }
+        } else {
+            showAlert(message_type, message, 15000);
         }
 
     } catch (e) {
         showError(e);
+    } finally {
+        window.setTimeout(function () {
+            hideLoading();
+        }, 300);
     }
 };
 
@@ -228,6 +258,10 @@ const getUOM = async () => {
 
     } catch (e) {
         showError(e);
+    } finally {
+        window.setTimeout(function () {
+            hideLoading();
+        }, 300);
     }
 };
 
@@ -289,9 +323,15 @@ const submit = async () => {
         formData.append("total_seat", total_seat);
         formData.append("price", validation.includes(parseFloat(price.replace(',', '.'))) ? 0 : parseFloat(price.replace(',', '.')));
 
+        for (let i = 0; i < photoRemoved.length; i++) {
+            formData.append("photo_removed[]", photoRemoved[i]);
+        }
+
         if (imageFile.getFiles().length > 0) {
-            const finalPhoto = imageFile.getFiles()[0].file;
-            formData.append("photo", finalPhoto);
+            for (let i = 0; i < imageFile.getFiles().length; i++) {
+                const finalPhoto = imageFile.getFiles()[i].file;
+                formData.append("photo[]", finalPhoto);
+            }
         }
 
         showLoading();
@@ -393,13 +433,7 @@ $("#btnCancel").on("click", function () {
     clearForm();
 });
 
-$("#btnCancel").on("click", function () {
-    dataTab.show();
-    disableForm(true);
-    clearForm();
-});
-
-$("#mainTable").on("click", `button[action="edit"]`, function () {
+$("#mainTable").on("click", `button[action="edit"]`, async function () {
     const row = $(this).parents("tr");
     const data = mainTable.row(row).data();
     const validation = [null, "", NaN, undefined];
@@ -420,6 +454,7 @@ $("#mainTable").on("click", `button[action="edit"]`, function () {
     //     imageFile.addFile(`../assets/images/items/${photo}`);
     // }
     selectedId = id;
+    await getPhoto(id);
 });
 
 $("#mainTable").on("click", `button[action="delete"]`, function () {
@@ -508,6 +543,11 @@ $(document).ready(async function () {
             labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`
         }
     );
+
+    document.querySelector('.multiple-filepond').addEventListener('FilePond:removefile', (e) => {
+        const fileName = e.detail.file.filename;
+        photoRemoved.push(fileName);
+    });
 
     generateMainTable();
     generateInputMask();
