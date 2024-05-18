@@ -30,7 +30,7 @@
                 @if (auth()->check() && auth()->user()->role === 'Admin')
                 <li class="slide__category"><span class="category-name">Transaction</span></li>
                 <li class="slide">
-                    <a href="javascript:void(0);" class="side-menu__item">
+                    <a href="{{ route('transaction.payment') }}" class="side-menu__item">
                         <i class="side-menu__icon fa-solid fa-money-bill-1-wave"></i>
                         <span class="side-menu__label">Payment</span>
                     </a>
@@ -56,7 +56,7 @@
                 </li>
                 <li class="slide__category"><span class="category-name">Report</span></li>
                 <li class="slide">
-                    <a href="javascript:void(0);" class="side-menu__item">
+                    <a href="{{ route('report.sales') }}" class="side-menu__item">
                         <i class="side-menu__icon fa-solid fa-file-invoice-dollar"></i>
                         <span class="side-menu__label">Sales Report</span>
                     </a>
@@ -70,7 +70,7 @@
                     </a>
                 </li>
                 <li class="slide">
-                    <a href="javascript:void(0);" class="side-menu__item">
+                    <a href="{{ route('transaction.cart') }}" class="side-menu__item">
                         <i class="side-menu__icon fa-solid fa-cart-shopping"></i>
                         <span class="side-menu__label">Cart</span>
                     </a>

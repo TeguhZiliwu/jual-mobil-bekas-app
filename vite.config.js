@@ -16,11 +16,9 @@ export default defineConfig({
                 'resources/js/pages/masters/brand.js',
                 'resources/js/pages/masters/item.js',
                 'resources/js/pages/transactions/car-for-sale.js',
-
-                'resources/js/pages/masters/unit-of-measurement.js',
-                'resources/js/pages/masters/supplier.js',
-                'resources/js/pages/masters/supplier-contact.js',
-                'resources/js/pages/transactions/stock-in.js',
+                'resources/js/pages/transactions/cart.js',
+                'resources/js/pages/transactions/payment.js',
+                'resources/js/pages/reports/sales.js',
             ],
 
             refresh: true,

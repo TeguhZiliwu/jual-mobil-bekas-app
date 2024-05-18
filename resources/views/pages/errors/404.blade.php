@@ -5,23 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pet Shop</title>
+    <title>Error | Jual Mobil Bekas</title>
     <meta name="Description" content="Application POS for PetShop">
     <meta name="Author" content="TZDeveloper">
-    <meta name="keywords" content="admin, shop, pos, petshop, reporting, cms">
-
-    <!-- Favicon -->
-    <link rel="icon" href="../assets/images/brand-logos/favicon.ico" type="image/x-icon">
-    <script src="../assets/js/authentication-main.js"></script>
-    <link id="style" href="../assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" >
-    <link href="../assets/css/styles.min.css" rel="stylesheet" >
-    <link href="../assets/css/icons.min.css" rel="stylesheet" >
-
-    <link rel="icon" href="{{ asset('assets/images/brand-logos/favicon.ico') }}" type="image/x-icon">
-    <link href="{{ asset('assets/js/authentication-main.js') }}" rel="stylesheet" />
+    <meta name="keywords" content="admin, mobil, car, bekas, shop, jual-beli, sell, reporting, cms">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" href="{{ asset('assets/images/brand-logos/logo.jpg') }}" type="image/x-icon">
     <link id="style" href="{{ asset('assets/libs/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('assets/css/styles.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/styles.css?v=') . time() }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/node-waves/waves.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/simplebar/simplebar.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/@simonwep/pickr/themes/nano.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/choices.js/public/assets/styles/choices.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/jsvectormap/css/jsvectormap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/fontawesome-6.1.0/css/all.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/libs/select2/select2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" />
+    @vite(['resources/css/app.css'])
 </head>
 
 <body>

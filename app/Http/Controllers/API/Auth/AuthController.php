@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends BaseController
@@ -39,16 +40,14 @@ class AuthController extends BaseController
             if(Hash::check($request->password, $user->password)){
                 Auth::attempt($final_field);
                 $auth_user = Auth::user(); 
-                $token = $auth_user->createToken(env('APP_TOKEN_NAME'))->plainTextToken;
+                $token = $auth_user->createToken("JualMobilBekas")->plainTextToken;
                 $result = [
                     'token' => $token,
                     'userid' => "$user->first_name $user->last_name"
                 ];
                 $cookie = Cookie::make('token', $token, config('auth.token_lifetime'));
-                $sessionLifetime = config('session.lifetime') * 60;
-                $lifeTimeCookie = Cookie::make('session_lifetime', $sessionLifetime, config('auth.token_lifetime'), null, null, false, false);
        
-                return $this->sendResponse($result, 'User Sign In successfully.')->withCookie($cookie)->withCookie($lifeTimeCookie);
+                return $this->sendResponse($result, 'User Sign In successfully.')->withCookie($cookie);
             } 
             else{ 
                 $message = 'Invalid User ID or Password. Please review and try again.';
@@ -100,7 +99,7 @@ class AuthController extends BaseController
     
     public static function generateTokenId()
     {
-        $tokenName = env('APP_TOKEN_NAME');
+        $tokenName = "JualMobilBekas";
         // Get the current date
         $currentDate = Carbon::now()->format('ymd');
         
@@ -127,24 +126,9 @@ class AuthController extends BaseController
     public function sign_out(Request $request)
     {
         try {
-            if (method_exists(auth()->user()->currentAccessToken(), 'delete')) {
-                // auth()->user()->currentAccessToken()->delete();
-                auth()->user()->currentAccessToken()->update([
-                    'expires_at' => now() // Example: Set expiry to 30 minutes from now
-                ]);
-            } else {
-                $bearer_token= request()->bearerToken();
-                $bearer_token_parts = explode('|', $bearer_token);
-                $bearer_token_id = $bearer_token_parts[0];
-
-                DB::table('personal_access_tokens')
-                ->where('id', $bearer_token_id)
-                ->update(['expires_at' => now()]);
-            }
-
             auth()->guard('web')->logout();
-
-            return $this->sendResponse(null, 'User Sign Out successfully.');
+            
+            return $this->sendResponse(true, 'User Sign Out successfully.');
         } catch (\Throwable $th) {
             throw $th;
         }

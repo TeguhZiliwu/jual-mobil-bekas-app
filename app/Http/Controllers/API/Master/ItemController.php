@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Master;
 
 use App\Http\Controllers\API\BaseController;
+use App\Models\Master\Cart;
 use App\Models\Master\Item;
 use App\Models\Master\ItemPhoto;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class ItemController extends BaseController
                 $query->where('A.name', 'like', '%' . $keyword . '%')
                     ->orWhere('A.description', 'like', '%' . $keyword . '%')
                     ->orWhere('D.name', 'like', '%' . $keyword . '%');
-            })->get();
+            })->where('A.status', '<>', 'SOLD')->get();
 
             return $this->sendResponse($result, 'Data retrieved successfully.');
         } catch (\Throwable $th) {
@@ -100,12 +101,12 @@ class ItemController extends BaseController
 
             // Check if the record was recently created
             $result = $item->wasRecentlyCreated;
-            
+
             if ($request->hasFile('photo')) {
-                $allowedfileExtension = ['jpeg','jpg','png'];
+                $allowedfileExtension = ['jpeg', 'jpg', 'png'];
                 $files = $request->file('photo');
                 foreach ($files as $index => $file) {
-                    
+
                     $filename = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
                     $uniqid = uniqid();
@@ -172,10 +173,10 @@ class ItemController extends BaseController
             unset($final_field['photo']);
             unset($final_field['photo_removed']);
             if ($request->hasFile('photo')) {
-                $allowedfileExtension = ['jpeg','jpg','png'];
+                $allowedfileExtension = ['jpeg', 'jpg', 'png'];
                 $files = $request->file('photo');
                 foreach ($files as $index => $file) {
-                    
+
                     $filename = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
 
@@ -183,7 +184,7 @@ class ItemController extends BaseController
                         $uniqid = uniqid();
                         $finalName = "{$request->name}_{$uniqid}.{$extension}";
                         $check = in_array($extension, $allowedfileExtension);
-    
+
                         if (!$check) {
                             $validationPhoto = false;
                         } else {
@@ -213,7 +214,7 @@ class ItemController extends BaseController
                 foreach ($request->photo_removed as $index => $photo) {
                     $filePath = 'assets/images/items/' . $photo;
                     $result = (bool) ItemPhoto::where('item_id', $request_data["id"])->where('name', $photo)->delete();
-    
+
                     if (File::exists($filePath)) {
                         // Delete the file
                         File::delete($filePath);
@@ -255,7 +256,7 @@ class ItemController extends BaseController
             throw $th;
         }
     }
-    
+
     //delete
     public function get_photo(Request $request)
     {
@@ -272,10 +273,49 @@ class ItemController extends BaseController
                 $validation_message = $validator->errors();
                 return $this->sendResponse(null, $message, false, $message_type, $validation_message);
             }
-            
+
             $result = ItemPhoto::where('item_id', $request_data["id"])->get();
 
             return $this->sendResponse($result, 'Data retrieved successfully.');
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    //create
+    public function add_to_cart(Request $request)
+    {
+        try {
+            $auth_user = Auth::user();
+            $request_data = $request->only('item_id');
+            $final_field = $request_data;
+
+            $validator = Validator::make($request_data, [
+                'item_id' => 'required|exists:items,id'
+            ]);
+
+            $final_field['userid'] = $auth_user->userid;
+            $final_field['created_by'] = $auth_user->userid;
+            $final_field['created_at'] = now();
+
+            if ($validator->fails()) {
+                $message = 'Invalid data provided. Please review and try again.';
+                $message_type = 'warning';
+                $validation_message = $validator->errors();
+                return $this->sendResponse(null, $message, false, $message_type, $validation_message);
+            }
+
+            $exists = Cart::where('userid', $auth_user->userid)
+                ->where('item_id', $request_data["item_id"])
+                ->exists();
+
+            $result = true;
+            if (!$exists) {
+                $result = (bool) Cart::create($final_field);
+            }
+            $message = $result ? 'Car added successfully to cart!' : 'Something wrong when adding to cart! Please contact the administrator!';
+
+            return $this->sendResponse($result, $message);
         } catch (\Throwable $th) {
             throw $th;
         }

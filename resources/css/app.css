@@ -192,3 +192,7 @@ table.dataTable thead th.action-column {
 .no-found-car {
     width: 200px;
 }
+
+a.receipt:hover {
+    text-decoration: underline;
+}

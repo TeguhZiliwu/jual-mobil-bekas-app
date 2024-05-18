@@ -64,6 +64,50 @@
     <div class="scrollToTop">
         <span class="arrow"><i class="las la-angle-double-up"></i></span>
     </div>
+    <div class="modal fade" id="modalChangePassword" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title"><i class="fa-solid fa-lock"></i> Change Password</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xl-12 col-12">
+                            <div class="form-group">
+                                <label for="txtOldPassword" class="form-label">Old Password <span class="text-danger">*</span></label>
+                                <div class="position-relative password-section">
+                                    <input type="password" class="form-control change-password-text-field" id="txtOldPassword" placeholder="Enter Old Password" autocomplete="off" maxlength="100" />
+                                    <i class="password-icon fa-solid fa-eye"></i>
+                                </div>
+                                <span class="badge bg-primary float-end mt-2 counter-char">0/100</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="txtPassword" class="form-label">Password <span class="text-danger">*</span></label>
+                                <div class="position-relative password-section">
+                                    <input type="password" class="form-control change-password-text-field" id="txtPassword" placeholder="Enter Password" autocomplete="off" maxlength="100" />
+                                    <i class="password-icon fa-solid fa-eye"></i>
+                                </div>
+                                <span class="badge bg-primary float-end mt-2 counter-char">0/100</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="txtConfirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <div class="position-relative password-section">
+                                    <input type="password" class="form-control change-password-text-field" id="txtConfirmPassword" placeholder="Enter Confirm Password" autocomplete="off" maxlength="100" />
+                                    <i class="password-icon fa-solid fa-eye"></i>
+                                </div>
+                                <span class="badge bg-primary float-end mt-2 counter-char">0/100</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="btnUploadReceipt" item-id="" transaction-id="">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="responsive-overlay"></div>
 
     <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}"></script>

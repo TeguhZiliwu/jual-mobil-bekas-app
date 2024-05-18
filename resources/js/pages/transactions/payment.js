@@ -1,7 +1,5 @@
 import { initInputMask, validateForm, showAlert, showConfirmBox, showError, generateDataTable, generateDropdownOption, showLoading, hideLoading, callAPI, formatToRupiah, formatNumber } from "../../global/common";
 
-const dataTab = new bootstrap.Tab($('[data-bs-target="#nav-data"]'));
-let imageFile;
 let mainTable;
 let isEdit = false;
 let selectedId = "";
@@ -13,7 +11,6 @@ const disableForm = (isDisable) => {
         $(`.form-group select.dropdown-field`).val("").trigger("change").removeClass("is-invalid");
         $(`button.button-action`).prop("disabled", !isDisable);
         $(`.form-group input.text-field.conditional-disable`).prop("disabled", true);
-        imageFile.disabled = isDisable;
         mainTable.column(-1).nodes().to$().each(function (index) {
             $(this).find(`button[action="edit"]`).prop("disabled", !isDisable);
             $(this).find(`button[action="delete"]`).prop("disabled", !isDisable);
@@ -31,7 +28,6 @@ const clearForm = () => {
         $(`.form-control.text-field.price-field, .form-control.text-field.number-field`).val("");
         $(`#ddDiscountType`).val("").trigger("change");
         selectedId = "";
-        imageFile.removeFiles();
         window.setTimeout(function () {
             photoRemoved = [];
         }, 300);
@@ -113,12 +109,10 @@ const generateMainTable = () => {
     try {
         const extOption = {
             drawCallback: function () {
-                const isDisable = $("#btnSubmit").prop("disabled");
-                $("button.table-edit, button.table-delete").prop("disabled", !isDisable);
-                JsBarcode(".barcode").init();
+                
             },
             columnDefs: [{
-                targets: [-1, 10, 11],
+                targets: [-1],
                 orderable: false
             }],
             language: {
@@ -138,18 +132,15 @@ const generateMainTable = () => {
                     },
                     className: "col-no-table"
                 },
-                { data: "brand_name" },
-                { data: "name" },
-                { data: "description" },
+                { data: "item_name" },
+                { data: "full_name" },
                 {
-                    data: "cc",
+                    data: "price",
                     render: function (data, type, row, meta) {
-                        const finalResult = formatNumber(data, 2);
+                        const finalResult = formatToRupiah(data, 0);
                         return `${finalResult}`;
                     },
                 },
-                { data: "fuel_type" },
-                { data: "total_seat" },
                 {
                     data: "status",
                     render: function (data, type, row, meta) {
@@ -163,37 +154,17 @@ const generateMainTable = () => {
                     className: "text-center action-column",
                 },
                 {
-                    data: "price",
+                    data: "receipt_of_payment",
                     render: function (data, type, row, meta) {
-                        const finalResult = formatToRupiah(data, 0);
-                        return `${finalResult}`;
+
+                        return `<a class="text-primary receipt" href="../assets/images/receipts/${data}" download>Download Receipt</a>`;
                     },
-                },
-                { data: "created_by_name" },
-                {
-                    data: "created_at",
-                    render: function (data, type, row, meta) {
-                        if (data == null || data == "") {
-                            return "";
-                        }
-                        return moment(data).format('YYYY-MM-DD HH:mm:ss');
-                    }
-                },
-                { data: "updated_by_name" },
-                {
-                    data: "updated_at",
-                    render: function (data, type, row, meta) {
-                        if (data == null || data == "") {
-                            return "";
-                        }
-                        return moment(data).format('YYYY-MM-DD HH:mm:ss');
-                    }
+                    className: "text-center",
                 },
                 {
                     data: "",
                     render: function (data, type, row, meta) {
-                        const status = row["status"];
-                        const buttonAction = `<button class="btn btn-primary me-2 table-edit" action="edit"><i class="far fa-edit"></i> Edit</button><button class="btn btn-danger table-delete" action="delete"><i class="far fa-trash"></i> Delete</button>`;
+                        const buttonAction = `<button class="btn btn-primary me-2 table-edit" action="approve"><i class="fa-solid fa-check-double"></i> Approve</button><button class="btn btn-danger table-delete" action="reject"><i class="fa-solid fa-circle-xmark"></i> Reject</button>`;
                         return buttonAction;
                     },
                     className: "text-center action-column",
@@ -220,65 +191,11 @@ const getBrand = async () => {
     }
 };
 
-const getPhoto = async (id) => {
-    try {
-        const url = "/api/item/photo";
-
-        const param = {
-            id
-        };
-
-        showLoading();
-        const response = await callAPI(url, "GET", param);
-        const { data, success, message, message_type } = await response;
-
-        if (success) {
-            for (let i = 0; i < data.length; i++) {
-                const { name } = data[i];
-                imageFile.addFiles(`../assets/images/items/${name}`);
-            }
-        } else {
-            showAlert(message_type, message, 15000);
-        }
-
-    } catch (e) {
-        showError(e);
-    } finally {
-        window.setTimeout(function () {
-            hideLoading();
-        }, 300);
-    }
-};
-
-const getUOM = async () => {
-    try {
-        try {
-            const url = "/api/unit-of-measurement/list";
-            const target = $("#ddUOM");
-
-            await generateDropdownOption(url, null, target);
-        } catch (e) {
-            showError(e);
-        }
-
-    } catch (e) {
-        showError(e);
-    } finally {
-        window.setTimeout(function () {
-            hideLoading();
-        }, 300);
-    }
-};
-
 const loadData = async () => {
     try {
-        const url = "/api/item";
+        const url = "/api/payment";
 
         const keyword = $("#txtKeyword").val();
-        // const education = $("#ddFilterEducation").val();
-        // const batch = $("#ddFilterBatch").val();
-        // const startDate = $("#txtFilterStartDate").val();
-        // const endDate = $("#txtFilterEndDate").val();
 
         const param = {
             keyword
@@ -305,51 +222,22 @@ const loadData = async () => {
     }
 };
 
-const submit = async () => {
+const approve = async (id) => {
     try {
-        const url = isEdit ? "/api/item/update" : "/api/item/create";
+        const url = "/api/payment/approve";
 
-        const validation = [null, "", NaN, undefined];
-        const name = $("#txtName").val();
-        const description = $("#txtDescription").val();
-        const brand_id = $("#ddBrand").val();
-        const cc = $("#txtCC").inputmask('unmaskedvalue');
-        const fuel_type = $("#ddFuelType").val();
-        const total_seat = $("#ddSeat").val();
-        const price = $("#txtPrice").inputmask('unmaskedvalue');
-        const formData = new FormData();
-
-        formData.append("id", selectedId);
-        formData.append("name", name);
-        formData.append("description", description);
-        formData.append("brand_id", parseInt(brand_id));
-        formData.append("cc", validation.includes(parseFloat(cc.replace(',', '.'))) ? 0 : parseFloat(cc.replace(',', '.')));
-        formData.append("fuel_type", fuel_type);
-        formData.append("total_seat", total_seat);
-        formData.append("price", validation.includes(parseFloat(price.replace(',', '.'))) ? 0 : parseFloat(price.replace(',', '.')));
-
-        for (let i = 0; i < photoRemoved.length; i++) {
-            formData.append("photo_removed[]", photoRemoved[i]);
-        }
-
-        if (imageFile.getFiles().length > 0) {
-            for (let i = 0; i < imageFile.getFiles().length; i++) {
-                const finalPhoto = imageFile.getFiles()[i].file;
-                formData.append("photo[]", finalPhoto);
-            }
-        }
+        const param = {
+            transaction_id: id
+        };
 
         showLoading();
 
-        const response = await callAPI(url, "POST", formData, true);
+        const response = await callAPI(url, "POST", param);
         const { success, message, message_type } = await response;
 
         if (success) {
             showAlert("success", message, 15000);
             await loadData();
-            clearForm();
-            disableForm(true);
-            dataTab.show();
         }
         else {
             showAlert(message_type, message);
@@ -364,16 +252,16 @@ const submit = async () => {
     }
 };
 
-const deleteData = async (id) => {
+const reject = async (id) => {
     try {
-        const url = `/api/item/delete`;
+        const url = "/api/payment/reject";
 
         const param = {
-            id
+            transaction_id: id
         };
 
         showLoading();
-        const response = await callAPI(url, "DELETE", param);
+        const response = await callAPI(url, "POST", param);
 
         const { success, message, message_type } = await response;
 
@@ -397,84 +285,76 @@ const deleteData = async (id) => {
 
 // event start
 
-$("#btnSubmit").on("click", async function () {
-    try {
-        const name = $("#txtName");
-        const description = $("#txtDescription");
-        const brand = $("#ddBrand");
-        const cc = $("#txtCC");
-        const fuelType = $("#ddFuelType");
-        const seat = $("#ddSeat");
-        const price = $("#txtPrice");
-
-        let field = {
-            brand,
-            name,
-            description,
-            cc,
-            fuelType,
-            seat,
-            price
-
-        };
-
-        if (validateForm(field)) {
-            await submit();
-        }
-
-    } catch (error) {
-        showError(error);
-    }
+$("#btnAddData").on("click", function () {
+    formTab.show();
+    disableForm(false);
 });
 
 $("#btnCancel").on("click", function () {
-    dataTab.show();
     disableForm(true);
     clearForm();
 });
 
-$("#mainTable").on("click", `button[action="edit"]`, async function () {
-    const row = $(this).parents("tr");
-    const data = mainTable.row(row).data();
-    const validation = [null, "", NaN, undefined];
-    isEdit = true;
-    const { id, name, brand_id, description, fuel_type, total_seat, price, cc } = data;
-
-    disableForm(false);
-    $("#ddBrand").val(brand_id).trigger("change");
-    $("#txtName").val(name).trigger("keyup");
-    $("#txtDescription").val(description).trigger("keyup");
-    $("#ddFuelType").val(fuel_type).trigger("change");
-    $("#ddSeat").val(total_seat).trigger("change");
-    $("#txtPrice").val(price.toString().replace('.', ',')).trigger("keyup").trigger("input");
-    $("#txtCC").val(cc.toString().replace('.', ',')).trigger("keyup").trigger("input");
-
-    // if (!validation.includes(photo)) {
-    //     imageFile.addFile(`../assets/images/items/${photo}`);
-    // }
-    selectedId = id;
-    await getPhoto(id);
-});
-
-$("#mainTable").on("click", `button[action="delete"]`, function () {
+$("#mainTable").on("click", `button[action="approve"]`, async function () {
     const row = $(this).parents("tr");
     const data = mainTable.row(row).data();
     const { id } = data;
-    const confirmBox = showConfirmBox();
+    let defStyling = {
+        customClass: {
+            actions: "my-actions",
+            confirmButton: "order-2 custom-confrim-sweetalert2 btn btn-primary btn-wave waves-effect waves-light",
+            cancelButton: "order-1 custom-confrim-sweetalert2 btn btn-secondary-light btn-wave waves-effect waves-light me-3",
+        },
+        buttonsStyling: false
+    };
+
+    const confirmBox = showConfirmBox(defStyling);
 
     confirmBox.fire({
-        title: "Delete Data",
-        text: "Are you sure want to delete this data?",
+        title: "Approve Payment",
+        text: "Are you sure want to approve this payment?",
         icon: "question",
         showCancelButton: true,
-        confirmButtonText: `<i class="fa-regular fa-trash"></i> Delete`,
-        cancelButtonText: `<i class="fa-regular fa-xmark"></i> Cancel`,
+        confirmButtonText: `Yes`,
+        cancelButtonText: `Cancel`,
         allowOutsideClick: false,
     }).then(async (result) => {
         const { isConfirmed } = result;
 
         if (isConfirmed) {
-            await deleteData(id);
+            await approve(id);
+        }
+    });
+    selectedId = id;
+});
+
+$("#mainTable").on("click", `button[action="reject"]`, function () {
+    const row = $(this).parents("tr");
+    const data = mainTable.row(row).data();
+    const { id } = data;
+    let defStyling = {
+        customClass: {
+            actions: "my-actions",
+            confirmButton: "order-2 custom-confrim-sweetalert2 btn btn-primary btn-wave waves-effect waves-light",
+            cancelButton: "order-1 custom-confrim-sweetalert2 btn btn-secondary-light btn-wave waves-effect waves-light me-3",
+        },
+        buttonsStyling: false
+    };
+    const confirmBox = showConfirmBox(defStyling);
+
+    confirmBox.fire({
+        title: "Reject Payment",
+        text: "Are you sure want to reject this payment?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: `Yes`,
+        cancelButtonText: `Cancel`,
+        allowOutsideClick: false,
+    }).then(async (result) => {
+        const { isConfirmed } = result;
+
+        if (isConfirmed) {
+            await reject(id);
         }
     });
 });
@@ -487,32 +367,6 @@ $("#txtKeyword").on("keypress", async function (e) {
     if (e.which == 13) {
         await loadData();
     }
-});
-
-$(".margin-price-set-up").on("input", function () {
-    const validation = [null, "", NaN, undefined];
-    const capitalPrice = $("#txtCapitalPrice").inputmask('unmaskedvalue');
-    const price = $("#txtPrice").inputmask('unmaskedvalue');
-    const margin = (validation.includes(price) ? 0 : price) - (validation.includes(capitalPrice) ? 0 : capitalPrice);
-    $("#txtMarginPrice").val(margin);
-
-    if ($(this).inputmask('unmaskedvalue') === "") {
-        $(this).val("0");
-    }
-});
-
-$("#ddDiscountType").on("change", function () {
-    const value = $(this).val();
-    const asterixMandatory = `<span class="text-danger">*</span>`;
-    let label = `Discount`;
-    let isDisabled = true;
-
-    if (value !== "None") {
-        label += ` ${asterixMandatory}`;
-        isDisabled = false;
-        generateInputMaskForDiscount();
-    }
-    $("#txtDiscount").val("").removeClass("is-invalid").prop("disabled", isDisabled).siblings(`label[for="txtDiscount"]`).html(label);
 });
 
 $(".dataTables_length select.form-control.dropdown-field").on("change", async function (e) {
@@ -535,18 +389,6 @@ $(document).ready(async function () {
         FilePondPluginImageResize,
         FilePondPluginImageTransform
     );
-
-    imageFile = FilePond.create(
-        document.querySelector('.multiple-filepond'),
-        {
-            labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`
-        }
-    );
-
-    document.querySelector('.multiple-filepond').addEventListener('FilePond:removefile', (e) => {
-        const fileName = e.detail.file.filename;
-        photoRemoved.push(fileName);
-    });
 
     generateMainTable();
     generateInputMask();

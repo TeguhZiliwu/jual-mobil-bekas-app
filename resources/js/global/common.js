@@ -235,6 +235,7 @@ const callAPI = async (url, method, params = {}, uploadfile = false, headers = {
     try {
         const token = localStorage.getItem("token");
         headers = {
+            "Accept": "application/json",
             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             "Authorization": `Bearer ${token}`,
         };
@@ -242,7 +243,7 @@ const callAPI = async (url, method, params = {}, uploadfile = false, headers = {
 
         let options = {
             method,
-            // credentials: 'include',
+            credentials: 'include',
             headers
         };
 
@@ -263,8 +264,8 @@ const callAPI = async (url, method, params = {}, uploadfile = false, headers = {
         const statusCode = result.status;
 
         if (statusCode === 401) {
-            if (url != "/api/auth/login") {
-                window.location.href = "/login";
+            if (url != "/api/auth/signin") {
+                window.location.href = "/signin";
             }
         }
         else if (statusCode === 500) {
@@ -389,16 +390,18 @@ const signOut = async () => {
         const url = "/api/auth/signout";
 
         const param = {
-            userid: "teguh.ziliwu"
+
         };
 
         const response = await callAPI(url, "POST", param);
         const { success, message, message_type } = await response;
 
         if (success) {
-            showAlert("success", message, 15000);
             localStorage.clear();
-            window.location.href = `/signin`;
+            showAlert("success", message, 15000);
+            window.setTimeout(function () {
+                window.location.href = `/signin`;
+            }, 500);
         }
         else {
             showAlert(message_type, message);

@@ -106,7 +106,7 @@ const loadData = async () => {
                         for (let i = 0; i < photo.length; i++) {
                             const { name } = photo[i];
                             photoSlide += ` <div class="carousel-item ${i === 0 ? "active" : ""}">
-                                                <img src="../assets/images/items/${name}" class="d-block w-100" alt="${name}">
+                                                <img src="../assets/images/items/${name}" class="d-block w-100" alt="${name}" loading="lazy">
                                             </div>`;
 
                             photoIndicator += `<button type="button" data-bs-target="#carouselCarForSale_${id}" data-bs-slide-to="${i}" class="${i === 0 ? "active" : ""}" aria-label="Slide ${i}"></button>`;
@@ -138,7 +138,7 @@ const loadData = async () => {
                                                         <span class="visually-hidden">Next</span>
                                                     </button>
                                                 </div>
-                                                <a href="javascript:void(0)" class="adtocart" action="addcart">
+                                                <a href="javascript:void(0)" class="adtocart" action="addcart" item-id="${id}">
                                                     <i class="las la-shopping-cart"></i>
                                                 </a>
                                             </div>
@@ -164,10 +164,11 @@ const loadData = async () => {
                     interval: 3000
                 });
                 $(`a[action="addcart"]`).on("click", async function () {
-                    alert("masukin cart")
+                    const id = $(this).attr("item-id");
+                    await addToCart(id);
                 });
             } else {
-                let card = `<div class="card mb-4 text-center">
+                let card = `<div class="card mb-4 text-center car-card-section">
                                     <div class="card-body h-100"> 
                                         <img src="../assets/images/errors/no-data.svg" alt="not found" class="no-found-car">
                                         <h5 class="mt-3 tx-18">Items Not Found</h5> 
@@ -186,6 +187,30 @@ const loadData = async () => {
         window.setTimeout(function () {
             hideLoading();
         }, 300);
+    }
+};
+
+const addToCart = async (item_id) => {
+    try {
+        const url = "/api/item/add-to-cart";
+
+        const param = {
+            item_id
+        };
+
+        const response = await callAPI(url, "POST", param);
+        const { success, message, message_type } = await response;
+
+        if (success) {
+            showAlert("success", message, 15000);
+        }
+        else {
+            showAlert(message_type, message);
+        }
+    } catch (e) {
+        showError(e);
+    } finally {
+
     }
 };
 

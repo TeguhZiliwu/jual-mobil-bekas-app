@@ -3,6 +3,9 @@ import { signOut, preLoad } from "./global/common";
 
 window.onresize = windowOnResize;
 
+let modalChangePassword = new bootstrap.Modal('#modalChangePassword', {
+    backdrop: 'static'
+});
 
 $(".text-field").on("keyup", function () {
     let bgColor = "bg-primary";
@@ -26,7 +29,7 @@ $(document).ready(function () {
     var url = window.location;
     var pathName = url.pathname.toLowerCase();
     const href = url.href.toLowerCase();
-    
+
     $('ul.main-menu li.slide a[href="' + href + '"]').addClass('active');
     $('ul.main-menu li.slide a').filter(function () {
         return this.href.toLowerCase() == `${href}`;
@@ -68,4 +71,8 @@ $(`.password-icon`).on("click", function () {
 
 $(`#btnSignOut`).on("click", async function () {
     await signOut();
+});
+
+$(`#btnChangePassword`).on("click", async function () {
+    modalChangePassword.show();
 });

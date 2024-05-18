@@ -76,7 +76,7 @@
                         </div>
                     </li>
                     <li>
-                        <a class="dropdown-item d-flex" href="profile.html">
+                        <a class="dropdown-item d-flex" id="btnChangePassword" href="javascript:void(0);">
                             <i class="fa-solid fa-lock-keyhole fs-18 me-2 op-7"></i>Change Password
                         </a>
                     </li>
