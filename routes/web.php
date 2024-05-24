@@ -9,6 +9,7 @@ use App\Http\Controllers\API\Master\UnitOfMeasurementController;
 use App\Http\Controllers\API\Master\UserController;
 use App\Http\Controllers\API\Transaction\CartController;
 use App\Http\Controllers\API\Transaction\PaymentController;
+use App\Http\Controllers\API\Transaction\TransactionController;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Route;
@@ -40,7 +41,30 @@ Route::get('/jual-mobil-bekas', function () {
 
 Route::middleware([Authenticate::class])->group(function () {
     Route::get('/', function () {
-        return view('welcome');
+        $totalIncomeCurrMonth = DB::table('transactions')
+                    ->whereYear('date', date('Y'))
+                    ->whereMonth('date', date('m'))
+                    ->where('status', 'DONE')
+                    ->sum('price');
+
+        $totalIncomeCurrYear = DB::table('transactions')
+                    ->whereYear('date', date('Y'))
+                    ->where('status', 'DONE')
+                    ->sum('price');
+
+        $totalIncomeAllTime = DB::table('transactions')
+                    ->where('status', 'DONE')
+                    ->sum('price');
+
+        $totalCarSold = DB::table('transactions')
+                    ->where('status', 'DONE')
+                    ->count('item_id');
+
+        $formattedTotalIncomeCurrMonth = 'Rp. ' . number_format($totalIncomeCurrMonth, 2, ',', '.');
+        $formattedTotalIncomeCurrYear = 'Rp. ' . number_format($totalIncomeCurrYear, 2, ',', '.');
+        $formattedTotalIncomeAllTime = 'Rp. ' . number_format($totalIncomeAllTime, 2, ',', '.');
+        
+        return view('welcome', ['formattedTotalIncomeCurrMonth' => $formattedTotalIncomeCurrMonth, 'formattedTotalIncomeCurrYear' => $formattedTotalIncomeCurrYear, 'formattedTotalIncomeAllTime' => $formattedTotalIncomeAllTime, 'totalCarSold' => $totalCarSold]);
     })->name('home');
     
     Route::group(['prefix' => 'master'], function () {
@@ -65,6 +89,10 @@ Route::middleware([Authenticate::class])->group(function () {
         Route::get('/cart', function () {
             return view('pages.transactions.cart');
         })->name('transaction.cart');
+        
+        Route::get('/history', function () {
+            return view('pages.transactions.history');
+        })->name('transaction.history');
         
         Route::get('/payment', function () {
             return view('pages.transactions.payment');
@@ -96,6 +124,7 @@ Route::group(['prefix' => 'api'], function () {
         Route::post('/create', [UserController::class, 'create']);
         Route::post('/update', [UserController::class, 'update']);
         Route::delete('/delete', [UserController::class, 'delete']);
+        Route::post('/change-password', [UserController::class, 'change_password']);
     });
 
     Route::group(['prefix' => 'brand'], function () {
@@ -120,6 +149,12 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('/', [CartController::class, 'get_cart']);
         Route::post('/buy', [CartController::class, 'buy']);
         Route::post('/upload', [CartController::class, 'upload_receipt']);
+    });
+
+    Route::group(['prefix' => 'history'], function () {
+        Route::get('/', [TransactionController::class, 'review']);
+        Route::post('/post-review', [TransactionController::class, 'post_review']);
+        Route::get('/get-rating-review', [TransactionController::class, 'get_rating_review']);
     });
 
     Route::group(['prefix' => 'payment'], function () {

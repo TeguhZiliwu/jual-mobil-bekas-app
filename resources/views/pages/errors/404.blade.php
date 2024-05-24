@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Error | Jual Mobil Bekas</title>
-    <meta name="Description" content="Application POS for PetShop">
+    <meta name="Description" content="Jual Mobil Bekas | BMS App">
     <meta name="Author" content="TZDeveloper">
     <meta name="keywords" content="admin, mobil, car, bekas, shop, jual-beli, sell, reporting, cms">
     <meta name="csrf-token" content="{{ csrf_token() }}">

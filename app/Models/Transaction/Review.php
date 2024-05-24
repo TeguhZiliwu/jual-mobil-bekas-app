@@ -5,10 +5,10 @@ namespace App\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class POSTransaction extends Model
+class Review extends Model
 {
     use HasFactory;
-
+    
     public $timestamps = false;
     /**
      * The attributes that are mass assignable.
@@ -16,16 +16,15 @@ class POSTransaction extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'code',
-        'type',
-        'date',
-        'total_price',
-        'payment_method',
-        'reference_transfer_number',
-        'description',
-        'remark',
+        'item_id',
+        'comment',
+        'rating_service',
+        'rating_quality',
+        'rating_website_experience',
         'created_by',
         'created_at',
+        'updated_by',
+        'updated_at',
     ];
 
     /**
@@ -34,6 +33,7 @@ class POSTransaction extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'created_at' => 'datetime'
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 }

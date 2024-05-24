@@ -210,12 +210,24 @@ const loadData = async () => {
         const response = await callAPI(url, "GET", param);
         mainTable.clear().draw();
 
-        const { data, success, message, message_type } = await response;
+        const { data, success, message, message_type, validation_message } = await response;
 
         if (success) {
             mainTable.rows.add(data).draw();
         } else {
-            showAlert(message_type, message, 15000);
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
         }
     } catch (e) {
         showError(e);

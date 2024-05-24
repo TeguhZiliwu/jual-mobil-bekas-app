@@ -196,3 +196,7 @@ table.dataTable thead th.action-column {
 a.receipt:hover {
     text-decoration: underline;
 }
+
+.swal2-container {
+    z-index: 99999999999999999;    
+}

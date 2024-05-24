@@ -1,7 +1,7 @@
 <!-- Start::app-sidebar -->
 <aside class="app-sidebar sticky" id="sidebar">
     <div class="main-sidebar-header">
-        <a href="index.html" class="header-logo">
+        <a href="{{ route('home') }}" class="header-logo">
             <img src="{{ asset('assets/images/brand-logos/logo-long.jpg') }}" alt="logo" class="desktop-logo">
             <img src="{{ asset('assets/images/brand-logos/logo.jpg') }}" alt="logo" class="toggle-logo">
             <img src="{{ asset('assets/images/brand-logos/logo-long.jpg') }}" alt="logo" class="desktop-white">
@@ -25,6 +25,12 @@
                             <path d="M3 13h8V3H3v10zm2-8h4v6H5V5zm8 16h8V11h-8v10zm2-8h4v6h-4v-6zM13 3v6h8V3h-8zm6 4h-4V5h4v2zM3 21h8v-6H3v6zm2-4h4v2H5v-2z" />
                         </svg>
                         <span class="side-menu__label">Home</span>
+                    </a>
+                </li>
+                <li class="slide">
+                    <a href="{{ route('landing-page') }}" class="side-menu__item">
+                        <i class="side-menu__icon fa-solid fa-comments"></i>
+                        <span class="side-menu__label">Landing Page</span>
                     </a>
                 </li>
                 @if (auth()->check() && auth()->user()->role === 'Admin')
@@ -73,6 +79,12 @@
                     <a href="{{ route('transaction.cart') }}" class="side-menu__item">
                         <i class="side-menu__icon fa-solid fa-cart-shopping"></i>
                         <span class="side-menu__label">Cart</span>
+                    </a>
+                </li>
+                <li class="slide">
+                    <a href="{{ route('transaction.history') }}" class="side-menu__item">
+                        <i class="side-menu__icon fa-solid fa-list-check"></i>
+                        <span class="side-menu__label">History</span>
                     </a>
                 </li>
                 @endif

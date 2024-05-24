@@ -19,9 +19,10 @@ class CartController extends BaseController
         try {
             $auth_user = Auth::user();
             
-            $result = DB::table("carts AS A")->select('A.id', 'A.userid', 'C.id AS transacton_id', 'A.item_id', 'B.name AS item_name', 'B.description', 'B.status AS item_status', DB::raw("IFNULL(C.status, B.status) AS status"), 'B.price', 'B.fuel_type', 'B.total_seat', 'B.cc')->join('items AS B', 'A.item_id', '=', 'B.id')->leftJoin('transactions AS C', function($join) {
+            $result = DB::table("carts AS A")->select('A.id', 'A.userid', 'C.id AS transacton_id', 'A.item_id', 'B.name AS item_name', 'B.description', 'B.status AS item_status', 'B.status', 'B.price', 'B.fuel_type', 'B.total_seat', 'B.cc')->join('items AS B', 'A.item_id', '=', 'B.id')->leftJoin('transactions AS C', function($join) {
                 $join->on('A.userid', '=', 'C.userid')
-                     ->on('A.item_id', '=', 'C.item_id');
+                     ->on('A.item_id', '=', 'C.item_id')
+                     ->whereRaw('(C.status = "AWAITING PAYMENT" OR C.status = "PROCESSING")');
             })->where('A.userid', $auth_user->userid)->where('B.status', '<>', 'SOLD')->get();
 
             return $this->sendResponse($result, 'Data retrieved successfully.');

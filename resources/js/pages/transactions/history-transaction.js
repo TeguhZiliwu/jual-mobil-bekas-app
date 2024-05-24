@@ -1,13 +1,51 @@
 import { initInputMask, validateForm, showAlert, showConfirmBox, showError, generateDataTable, generateDropdownOption, showLoading, hideLoading, callAPI, formatToRupiah } from "../../global/common";
 
 const validation = [null, "", NaN, undefined];
-let uploadReceipt;
 
-let modalPayment = new bootstrap.Modal('#modalPayment', {
+let modalRating = new bootstrap.Modal('#modalRating', {
     backdrop: 'static'
 });
-let modalUploadReceipt = new bootstrap.Modal('#modalUploadReceipt', {
-    backdrop: 'static'
+
+const ratingReviewService = raterJs({
+    starSize: 24,
+    max: 5,
+    rating: 0,
+    element: document.querySelector("#ratingReviewService"),
+    // disableText: "Custom disable text!",
+    ratingText: "Star {rating}",
+    showToolTip: true,
+    rateCallback: function rateCallback(rating, done) {
+        ratingReviewService.setRating(rating);
+        done();
+    }
+});
+
+const ratingReviewQuality = raterJs({
+    starSize: 24,
+    max: 5,
+    rating: 0,
+    element: document.querySelector("#ratingReviewQuality"),
+    // disableText: "Custom disable text!",
+    ratingText: "Star {rating}",
+    showToolTip: true,
+    rateCallback: function rateCallback(rating, done) {
+        ratingReviewQuality.setRating(rating);
+        done();
+    }
+});
+
+const ratingReviewWebExperience = raterJs({
+    starSize: 24,
+    max: 5,
+    rating: 0,
+    element: document.querySelector("#ratingReviewWebExperience"),
+    // disableText: "Custom disable text!",
+    ratingText: "Star {rating}",
+    showToolTip: true,
+    rateCallback: function rateCallback(rating, done) {
+        ratingReviewWebExperience.setRating(rating);
+        done();
+    }
 });
 
 const clearForm = () => {
@@ -36,7 +74,7 @@ const generateSelect2 = () => {
         theme: "bootstrap-5",
         placeholder: 'All',
         allowClear: true,
-        dropdownParent: $('#modalPayment')
+        dropdownParent: $('#modalRating')
     });
 };
 
@@ -91,7 +129,7 @@ const getPhoto = async (id) => {
 
 const loadData = async () => {
     try {
-        const url = "/api/cart";
+        const url = "/api/history";
 
         showLoading();
         const response = await callAPI(url, "GET", null);
@@ -108,7 +146,9 @@ const loadData = async () => {
                                           <img src="../assets/images/errors/no-image.png" class="d-block w-100" alt="..." loading="lazy">
                                       </div>`;
                     let photoIndicator = `<button type="button" data-bs-target="#carouselCarForSale_${id}" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>`;
-                    let buttonAction = ``;
+                    let buttonAction = `<div class="d-grid gap-2 mb-4">
+                                            <button class="btn btn-success-light btn-wave waves-effect waves-light action-review" item-id="${item_id}" price="${price}" item-name="${item_name}"><i class="fa-solid fa-comments"></i> Review</button>
+                                        </div>`;
 
                     if (photo.length > 0) {
                         photoSlide = "";
@@ -127,14 +167,8 @@ const loadData = async () => {
 
                     if (status == "AWAITING PAYMENT") {
                         statuColor = "bg-warning";
-                        buttonAction = `<div class="d-grid gap-2 mb-4">
-                                            <button class="btn btn-success-light btn-wave waves-effect waves-light action-upload-receipt" transacton-id="${transacton_id}" item-id="${item_id}" price="${price}" item-name="${item_name}"><i class="fa-solid fa-receipt"></i> Upload Transfer Receipt</button>
-                                        </div>`;
                     } else if (status == "OPEN") {
                         statuColor = "bg-success";
-                        buttonAction = `<div class="d-grid gap-2 mb-4">
-                                            <button class="btn btn-success-light btn-wave waves-effect waves-light action-buy" item-id="${item_id}" price="${price}" item-name="${item_name}"><i class="fa-solid fa-money-bill-1-wave"></i> Buy</button>
-                                        </div>`;
                     } else if (status == "PROCESSING") {
                         statuColor = "bg-warning";
                     } else if (status == "CANCELLED" || status == "REJECTED") {
@@ -223,11 +257,10 @@ const loadData = async () => {
                         item_name,
                         price
                     };
-                    modalUploadReceipt.show();
                     setUploadReceipt(data);
                 });
 
-                $("button.action-buy").on("click", async function () {
+                $("button.action-review").on("click", async function () {
                     const item_id = $(this).attr("item-id");
                     const price = $(this).attr("price");
                     const item_name = $(this).attr("item-name");
@@ -236,8 +269,9 @@ const loadData = async () => {
                         item_name,
                         price
                     };
-                    modalPayment.show();
-                    setBuyDetail(data);
+                    modalRating.show();
+                    $("#lblItemName").text(item_name);
+                    $("#btnPostReview").attr("item-id", item_id);
                 });
             } else {
                 let card = `<div class="card mb-4 text-center cart-list">
@@ -273,21 +307,6 @@ const loadData = async () => {
     }
 };
 
-const setBuyDetail = (data) => {
-    try {
-        const { item_id, item_name, price } = data;
-        $("#btnConfirmBuy").attr("item-id", item_id);
-        $("#lblItemName").text(item_name);
-        $("#lblTotalPrice").text(formatToRupiah(price, 0));
-    } catch (e) {
-        showError(e);
-    } finally {
-        window.setTimeout(function () {
-            // hideLoading();
-        }, 300);
-    }
-};
-
 const setUploadReceipt = (data) => {
     try {
         const { item_id, item_name, transacton_id, price } = data;
@@ -301,16 +320,22 @@ const setUploadReceipt = (data) => {
     }
 };
 
-const confirmBuy = async () => {
+const postReview = async () => {
     try {
-        const url = "/api/cart/buy";
+        const url = "/api/history/post-review";
 
-        const item_id = $("#btnConfirmBuy").attr("item-id");
-        const payment_method = $(`input[name="paymentType"]:checked`).val();
+        const item_id = $("#btnPostReview").attr("item-id");
+        const rating_service = ratingReviewService.getRating();
+        const rating_quality = ratingReviewQuality.getRating();
+        const rating_website_experience = ratingReviewWebExperience.getRating();
+        const comment = $(`#txtComment`).val();
 
         const param = {
             item_id,
-            payment_method
+            rating_service,
+            rating_quality,
+            rating_website_experience,
+            comment
         };
 
         showLoading();
@@ -321,7 +346,7 @@ const confirmBuy = async () => {
         if (success) {
             showAlert("success", message, 15000);
             await loadData();
-            modalPayment.hide();
+            modalRating.hide();
         }
         else {
             if (validation_message) {
@@ -405,7 +430,6 @@ const uploadPayment = async () => {
         if (success) {
             showAlert("success", message, 15000);      
             await loadData();      
-            modalUploadReceipt.hide();
         }
         else {
             if (validation_message) {
@@ -438,18 +462,8 @@ $("#btnSearch").on("click", async function () {
     await loadData();
 });
 
-$("#btnConfirmBuy").on("click", async function () {
-    let valid = true;
-    const payment_type = $(`input[name="paymentType"]:checked`).val();
-
-    if (validation.includes(payment_type)) {
-        showAlert("warning", "Please choose payment type!", 15000);
-        valid = false;
-    }
-
-    if (valid) {
-        await confirmBuy();
-    }
+$("#btnPostReview").on("click", async function () {
+    await postReview();
 });
 
 $("#btnUploadReceipt").on("click", async function () {
@@ -486,20 +500,13 @@ $(`input[name="paymentType"]`).on("change", async function (e) {
     }
 });
 
-document.getElementById('modalPayment').addEventListener('hidden.bs.modal', event => {
-    $("p.label-payment-type").each(function () {
-        const hasNone = $(this).hasClass("d-none");
-        if (!hasNone) {
-            $(this).addClass("d-none");
-        }
-    });
-    $("#btnConfirmBuy").attr("item-id", "");
+document.getElementById('modalRating').addEventListener('hidden.bs.modal', event => {
+    $("#btnPostReview").attr("item-id", "");
     $("#lblItemName").text("");
-    $("#lblTotalPrice").text("");
-});
-
-document.getElementById('modalUploadReceipt').addEventListener('hidden.bs.modal', event => {
-    $("#btnUploadReceipt").attr("item-id", "").attr("transaction-id", "");
+    ratingReviewService.clear();
+    ratingReviewQuality.clear();
+    ratingReviewWebExperience.clear();
+    $(`#txtComment`).val("");
 });
 
 // event end
@@ -518,12 +525,6 @@ $(document).ready(async function () {
         FilePondPluginImageTransform
     );
 
-    uploadReceipt = FilePond.create(
-        document.querySelector('.multiple-filepond'),
-        {
-            labelIdle: `Drag & Drop your picture or <span class="filepond--label-action">Browse</span>`
-        }
-    );
     generateSelect2();
     await loadData();
 });

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
@@ -56,7 +57,7 @@ class UserController extends BaseController
             $auth_user = Auth::user();
             $request_data = $request->only('userid', 'password', 'full_name', 'email', 'phone_number', 'role');
             $final_field = $request_data;
-            
+
             $validator = Validator::make($request_data, [
                 'userid' => 'required|max:50|unique:users,userid,' . $request->userid,
                 'password' => 'required|min:6|max:100',
@@ -151,6 +152,40 @@ class UserController extends BaseController
             $message = $result ? 'Delete data successfully!' : 'Something wrong when deleting the data! Please contact the administrator!';
 
             return $this->sendResponse($result, $message);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function change_password(Request $request)
+    {
+        try {
+            $request_data = $request->only('old_password', 'password');
+
+            $validator = Validator::make($request_data, [
+                'old_password' => 'required|min:6|max:100',
+                'password' => 'required|min:6|max:100',
+            ]);
+
+            if ($validator->fails()) {
+                $message = 'Invalid data provided. Please review and try again.';
+                $message_type = 'warning';
+                $validation_message = $validator->errors();
+                return $this->sendResponse(null, $message, false, $message_type, $validation_message);
+            }
+
+            // Check if the current password matches the user's password
+            if (!Hash::check($request->old_password, Auth::user()->password)) {
+                return $this->sendResponse(null, "Current password is incorrect.", false, "warning");
+            }
+
+            $user = Auth::user();
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            $message = 'Password changed successfully!';
+
+            return $this->sendResponse(true, $message);
         } catch (\Throwable $th) {
             throw $th;
         }

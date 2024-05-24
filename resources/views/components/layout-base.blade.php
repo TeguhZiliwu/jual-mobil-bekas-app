@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $titlePage }} | BMS Motor</title>
-    <meta name="Description" content="Application POS for PetShop">
+    <meta name="Description" content="Jual Mobil Bekas | BMS App">
     <meta name="Author" content="TZDeveloper">
-    <meta name="keywords" content="admin, shop, pos, petshop, reporting, cms">
+    <meta name="keywords" content="admin, shop, pos, Jual Mobil Bekas | BMS App, reporting, cms">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('assets/images/brand-logos/logo.jpg') }}" type="image/x-icon">
     <link id="style" href="{{ asset('assets/libs/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
@@ -103,7 +103,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="btnUploadReceipt" item-id="" transaction-id="">Confirm</button>
+                    <button type="button" class="btn btn-primary" id="btnSubmitChangePassword">Confirm</button>
                 </div>
             </div>
         </div>

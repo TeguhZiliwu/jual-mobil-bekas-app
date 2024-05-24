@@ -53,12 +53,24 @@ const getPhoto = async (id) => {
         };
 
         const response = await callAPI(url, "GET", param);
-        const { data, success, message, message_type } = await response;
+        const { data, success, message, message_type, validation_message } = await response;
 
         if (success) {
             result = data;
         } else {
-            showAlert(message_type, message, 15000);
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
         }
 
     } catch (e) {
@@ -88,7 +100,7 @@ const loadData = async () => {
         const response = await callAPI(url, "GET", param);
 
         $("#carList .car-card-section").remove();
-        const { data, success, message, message_type } = await response;
+        const { data, success, message, message_type, validation_message } = await response;
 
         if (success) {
             if (data.length > 0) {
@@ -179,7 +191,19 @@ const loadData = async () => {
                 $("#carList").append(card);
             }
         } else {
-            showAlert(message_type, message, 15000);
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
         }
     } catch (e) {
         showError(e);
@@ -199,13 +223,25 @@ const addToCart = async (item_id) => {
         };
 
         const response = await callAPI(url, "POST", param);
-        const { success, message, message_type } = await response;
+        const { data, success, message, message_type, validation_message } = await response;
 
         if (success) {
             showAlert("success", message, 15000);
         }
         else {
-            showAlert(message_type, message);
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
         }
     } catch (e) {
         showError(e);
@@ -231,7 +267,7 @@ const submit = async () => {
         showLoading();
 
         const response = await callAPI(url, "POST", param);
-        const { success, message, message_type } = await response;
+        const { data, success, message, message_type, validation_message } = await response;
 
         if (success) {
             showAlert("success", message, 15000);
@@ -241,7 +277,19 @@ const submit = async () => {
             dataTab.show();
         }
         else {
-            showAlert(message_type, message);
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
         }
     } catch (error) {
         showError(error);

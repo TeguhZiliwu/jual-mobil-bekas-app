@@ -1,13 +1,11 @@
 import { windowOnResize } from "../js/global/helper";
-import { signOut, preLoad } from "./global/common";
+import { signOut, preLoad, validateForm, showLoading, hideLoading, callAPI, showAlert, showError } from "./global/common";
 
 window.onresize = windowOnResize;
 
-let modalChangePassword = new bootstrap.Modal('#modalChangePassword', {
-    backdrop: 'static'
-});
+let modalChangePassword = "";
 
-$(".text-field").on("keyup", function () {
+$(".text-field, .change-password-text-field").on("keyup", function () {
     let bgColor = "bg-primary";
     let textLength = $(this).val().length;
     const maxLength = $(this).attr("maxlength");
@@ -25,6 +23,51 @@ $(".text-field").on("keyup", function () {
 });
 
 preLoad();
+
+const changePassword = async () => {
+    try {
+        const url = "/api/user/change-password";
+
+        const old_password = $("#txtOldPassword").val();
+        const password = $("#txtPassword").val();
+
+        const param = {
+            old_password,
+            password
+        };
+
+        showLoading();
+        const response = await callAPI(url, "POST", param);
+        const { data, success, message, message_type, validation_message } = await response;
+
+        if (success) {
+            showAlert("success", message, 15000);
+            modalChangePassword.hide();
+        } else {
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
+        }
+        
+    } catch (error) {
+        showError(error);
+    } finally {
+        window.setTimeout(function () {
+            hideLoading();
+        }, 300);
+    }
+}
+
 $(document).ready(function () {
     var url = window.location;
     var pathName = url.pathname.toLowerCase();
@@ -34,6 +77,36 @@ $(document).ready(function () {
     $('ul.main-menu li.slide a').filter(function () {
         return this.href.toLowerCase() == `${href}`;
     }).parents("li").addClass('active').children().addClass("active").parents("li").children("ul.slide-menu").css("display", "block").parents("li").addClass("open");
+
+
+    $(`#btnSubmitChangePassword`).on("click", async function () {
+        
+        const oldPassword = $("#txtOldPassword");
+        const password = $("#txtPassword");
+        const confirmPassword = $("#txtConfirmPassword");
+
+        let field = {
+            oldPassword,
+            password,
+            confirmPassword
+
+        };
+
+        if (validateForm(field)) {
+            if (password.val() == confirmPassword.val()) {
+                await changePassword();
+            } else {
+                showAlert("warning", "Passwords do not match. Please try again.", 15000);
+            }
+        }
+    });
+
+    if ($("#modalChangePassword").length > 0) {
+
+        modalChangePassword = new bootstrap.Modal('#modalChangePassword', {
+            backdrop: 'static'
+        });
+    }
 });
 
 $(`input`).on("input", function () {

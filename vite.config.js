@@ -19,6 +19,7 @@ export default defineConfig({
                 'resources/js/pages/transactions/cart.js',
                 'resources/js/pages/transactions/payment.js',
                 'resources/js/pages/reports/sales.js',
+                'resources/js/pages/transactions/landing-page.js',
             ],
 
             refresh: true,

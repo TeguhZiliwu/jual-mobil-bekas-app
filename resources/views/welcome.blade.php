@@ -12,27 +12,87 @@
                 <h4 class="mb-0">Hi, welcome back {{ auth()->user()->full_name }}!</h4>
                 <p class="mb-0 text-muted">Jual Mobil Bekas monitoring dashboard application.</p>
             </div>
-            <div class="main-dashboard-header-right">
-                <div>
-                    <label class="fs-13 text-muted">Customer Ratings</label>
-                    <div class="main-star">
-                        <i class="bi bi-star-fill fs-13 text-warning"></i>
-                        <i class="bi bi-star-fill fs-13 text-warning"></i>
-                        <i class="bi bi-star-fill fs-13 text-warning"></i>
-                        <i class="bi bi-star-fill fs-13 text-warning"></i>
-                        <i class="bi bi-star-fill fs-13 text-muted op-8"></i> <span>(14,873)</span>
+        </div>        
+        @if (auth()->check() && auth()->user()->role === 'Admin')
+        <div class="row">
+            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+                <div class="card overflow-hidden sales-card bg-primary-gradient">
+                    <div class="px-3 pt-3  pb-2 pt-0">
+                        <div>
+                            <h6 class="mb-3 fs-12 text-fixed-white">TOTAL INCOME ({{ strtoupper(\Carbon\Carbon::now()->format('F')) }})</h6>
+                        </div>
+                        <div class="pb-0 mt-0">
+                            <div class="d-flex">
+                                <div>
+                                    <h4 class="fs-20 fw-bold mb-1 text-fixed-white">{{ $formattedTotalIncomeCurrMonth }}</h4>
+                                </div>
+                                <span class="float-end my-auto ms-auto">
+                                    <i class="fas fa-calendar text-fixed-white"></i>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label class="fs-13 text-muted">Online Sales</label>
-                    <h5 class="mb-0 fw-semibold">563,275</h5>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+                <div class="card overflow-hidden sales-card bg-danger-gradient">
+                    <div class="px-3 pt-3  pb-2 pt-0">
+                        <div>
+                            <h6 class="mb-3 fs-12 text-fixed-white">TOTAL INCOME ({{ date('Y') }})</h6>
+                        </div>
+                        <div class="pb-0 mt-0">
+                            <div class="d-flex">
+                                <div>
+                                    <h4 class="fs-20 fw-bold mb-1 text-fixed-white">{{ $formattedTotalIncomeCurrYear }}</h4>
+                                </div>
+                                <span class="float-end my-auto ms-auto">
+                                    <i class="fas fa-dollar text-fixed-white"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="fs-13 text-muted">Offline Sales</label>
-                    <h5 class="mb-0 fw-semibold">783,675</h5>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+                <div class="card overflow-hidden sales-card bg-success-gradient">
+                    <div class="px-3 pt-3  pb-2 pt-0">
+                        <div>
+                            <h6 class="mb-3 fs-12 text-fixed-white">TOTAL INCOME (ALL TIME)</h6>
+                        </div>
+                        <div class="pb-0 mt-0">
+                            <div class="d-flex">
+                                <div>
+                                    <h4 class="fs-20 fw-bold mb-1 text-fixed-white">{{ $formattedTotalIncomeAllTime }}</h4>
+                                </div>
+                                <span class="float-end my-auto ms-auto">
+                                    <i class="fas fa-dollar text-fixed-white"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+                <div class="card overflow-hidden sales-card bg-warning-gradient">
+                    <div class="px-3 pt-3  pb-2 pt-0">
+                        <div>
+                            <h6 class="mb-3 fs-12 text-fixed-white">TOTAL CAR SOLD (ALL TIME)</h6>
+                        </div>
+                        <div class="pb-0 mt-0">
+                            <div class="d-flex">
+                                <div>
+                                    <h4 class="fs-20 fw-bold mb-1 text-fixed-white">{{ $totalCarSold }}</h4>
+                                </div>
+                                <span class="float-end my-auto ms-auto">
+                                    <i class="fas fa-car text-fixed-white"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        @endif
     </x-slot:renderContent>
 
 
