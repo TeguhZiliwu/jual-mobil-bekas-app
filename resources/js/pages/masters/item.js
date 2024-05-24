@@ -1,6 +1,7 @@
 import { initInputMask, validateForm, showAlert, showConfirmBox, showError, generateDataTable, generateDropdownOption, showLoading, hideLoading, callAPI, formatToRupiah, formatNumber } from "../../global/common";
 
 const dataTab = new bootstrap.Tab($('[data-bs-target="#nav-data"]'));
+const formTab = new bootstrap.Tab($('[data-bs-target="#nav-form"]'));
 let imageFile;
 let mainTable;
 let isEdit = false;
@@ -150,6 +151,7 @@ const generateMainTable = () => {
                 },
                 { data: "fuel_type" },
                 { data: "total_seat" },
+                { data: "transmission_type" },
                 {
                     data: "status",
                     render: function (data, type, row, meta) {
@@ -340,6 +342,7 @@ const submit = async () => {
         const cc = $("#txtCC").inputmask('unmaskedvalue');
         const fuel_type = $("#ddFuelType").val();
         const total_seat = $("#ddSeat").val();
+        const transmission_type = $("#ddTransmissionType").val();
         const price = $("#txtPrice").inputmask('unmaskedvalue');
         const formData = new FormData();
 
@@ -349,6 +352,7 @@ const submit = async () => {
         formData.append("brand_id", parseInt(brand_id));
         formData.append("cc", validation.includes(parseFloat(cc.replace(',', '.'))) ? 0 : parseFloat(cc.replace(',', '.')));
         formData.append("fuel_type", fuel_type);
+        formData.append("transmission_type", transmission_type);
         formData.append("total_seat", total_seat);
         formData.append("price", validation.includes(parseFloat(price.replace(',', '.'))) ? 0 : parseFloat(price.replace(',', '.')));
 
@@ -453,6 +457,7 @@ $("#btnSubmit").on("click", async function () {
         const cc = $("#txtCC");
         const fuelType = $("#ddFuelType");
         const seat = $("#ddSeat");
+        const transmissionType = $("#ddTransmissionType");
         const price = $("#txtPrice");
 
         let field = {
@@ -462,6 +467,7 @@ $("#btnSubmit").on("click", async function () {
             cc,
             fuelType,
             seat,
+            transmissionType,
             price
 
         };
@@ -475,6 +481,11 @@ $("#btnSubmit").on("click", async function () {
     }
 });
 
+$("#btnAddData").on("click", function () {
+    formTab.show();
+    disableForm(false);
+});
+
 $("#btnCancel").on("click", function () {
     dataTab.show();
     disableForm(true);
@@ -486,7 +497,8 @@ $("#mainTable").on("click", `button[action="edit"]`, async function () {
     const data = mainTable.row(row).data();
     const validation = [null, "", NaN, undefined];
     isEdit = true;
-    const { id, name, brand_id, description, fuel_type, total_seat, price, cc } = data;
+    const { id, name, brand_id, description, fuel_type, total_seat, transmission_type, price, cc } = data;
+    formTab.show();
 
     disableForm(false);
     $("#ddBrand").val(brand_id).trigger("change");
@@ -494,6 +506,7 @@ $("#mainTable").on("click", `button[action="edit"]`, async function () {
     $("#txtDescription").val(description).trigger("keyup");
     $("#ddFuelType").val(fuel_type).trigger("change");
     $("#ddSeat").val(total_seat).trigger("change");
+    $("#ddTransmissionType").val(transmission_type).trigger("change");
     $("#txtPrice").val(price.toString().replace('.', ',')).trigger("keyup").trigger("input");
     $("#txtCC").val(cc.toString().replace('.', ',')).trigger("keyup").trigger("input");
 

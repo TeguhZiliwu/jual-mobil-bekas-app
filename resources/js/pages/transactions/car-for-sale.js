@@ -105,7 +105,7 @@ const loadData = async () => {
         if (success) {
             if (data.length > 0) {
                 for (let i = 0; i < data.length; i++) {
-                    const { id, status, name, price, description, fuel_type, total_seat } = data[i];
+                    const { id, status, name, price, description, fuel_type, total_seat, transmission_type } = data[i];
                     const photo = await getPhoto(id);
                     let photoSlide = `<div class="carousel-item active">
                                           <img src="../assets/images/errors/no-image.png" class="d-block w-100" alt="...">
@@ -157,9 +157,10 @@ const loadData = async () => {
                                             <div class="text-center pt-3">
                                                 <h3 class="h6 mb-2 mt-4 fw-bold text-uppercase">${name}</h3>
                                                 <h3 class="h6 mb-2 fw-normal fs-13 text-base">${description}</h3>
-                                                <div class="d-flex justify-content-between">
+                                                <div class="d-flex justify-content-between mt-3">
                                                     <span><i class="fa-solid fa-gas-pump"></i> ${fuel_type}</span>
                                                     <span><i class="fa-solid fa-person-seat-reclined"></i> ${total_seat} Seats</span>
+                                                    <span><i class="fa-solid fa-gears"></i> ${transmission_type}</span>
                                                 </div>
                                                 <h4 class="h5 mb-0 mt-2 text-center fw-bold text-danger">
                                                     ${formatToRupiah(price, 0)}

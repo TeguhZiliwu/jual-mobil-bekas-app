@@ -67,6 +67,7 @@
                                     <th>CC</th>
                                     <th>Fuel Type</th>
                                     <th>Total Seat</th>
+                                    <th>Transmission Type</th>
                                     <th>Status</th>
                                     <th>Price</th>
                                     <th>Created By</th>
@@ -129,6 +130,16 @@
                                 <option value="4">4 Seat</option>
                                 <option value="6">6 Seat</option>
                                 <option value="8">8 Seat</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4">
+                        <div class="form-group">
+                            <label for="ddTransmissionType" class="form-label">Transmission Type <span class="text-danger">*</span></label>
+                            <select class="form-control dropdown-field" id="ddTransmissionType">
+                                <option value="" selected disabled>Select an Option</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Matic">Matic</option>
                             </select>
                         </div>
                     </div>

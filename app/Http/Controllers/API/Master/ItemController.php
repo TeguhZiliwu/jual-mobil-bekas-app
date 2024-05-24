@@ -20,7 +20,7 @@ class ItemController extends BaseController
         try {
             $request_data = $request->only('keyword');
 
-            $result = DB::table("items AS A")->select('A.id', 'A.brand_id', 'D.name AS brand_name', 'A.status', 'A.name', 'A.description', 'A.cc', 'A.fuel_type', 'A.total_seat', 'A.price', 'A.created_by', 'B.full_name AS created_by_name', 'A.created_at', 'A.updated_by', 'C.full_name AS updated_by_name', 'A.updated_at')->leftJoin('users AS B', 'A.created_by', '=', 'B.userid')->leftJoin('users AS C', 'A.updated_by', '=', 'C.userid')->join('brands AS D', 'A.brand_id', '=', 'D.id')->where(function ($query) use ($request_data) {
+            $result = DB::table("items AS A")->select('A.id', 'A.brand_id', 'D.name AS brand_name', 'A.status', 'A.name', 'A.description', 'A.cc', 'A.fuel_type', 'A.transmission_type', 'A.total_seat', 'A.price', 'A.created_by', 'B.full_name AS created_by_name', 'A.created_at', 'A.updated_by', 'C.full_name AS updated_by_name', 'A.updated_at')->leftJoin('users AS B', 'A.created_by', '=', 'B.userid')->leftJoin('users AS C', 'A.updated_by', '=', 'C.userid')->join('brands AS D', 'A.brand_id', '=', 'D.id')->where(function ($query) use ($request_data) {
                 $keyword = $request_data['keyword'];
                 $query->where('A.name', 'like', '%' . $keyword . '%')
                     ->orWhere('A.description', 'like', '%' . $keyword . '%')
@@ -39,7 +39,7 @@ class ItemController extends BaseController
         try {
             $request_data = $request->only('brand_id', 'fuel_type', 'seat_type', 'keyword');
 
-            $result = DB::table("items AS A")->select('A.id', 'A.brand_id', 'D.name AS brand_name', 'A.status', 'A.name', 'A.description', 'A.cc', 'A.fuel_type', 'A.total_seat', 'A.price')->leftJoin('users AS B', 'A.created_by', '=', 'B.userid')->leftJoin('users AS C', 'A.updated_by', '=', 'C.userid')->join('brands AS D', 'A.brand_id', '=', 'D.id')->where('status', 'OPEN')->where(function ($query) use ($request_data) {
+            $result = DB::table("items AS A")->select('A.id', 'A.brand_id', 'D.name AS brand_name', 'A.status', 'A.name', 'A.description', 'A.cc', 'A.fuel_type', 'A.transmission_type', 'A.total_seat', 'A.price')->leftJoin('users AS B', 'A.created_by', '=', 'B.userid')->leftJoin('users AS C', 'A.updated_by', '=', 'C.userid')->join('brands AS D', 'A.brand_id', '=', 'D.id')->where('status', 'OPEN')->where(function ($query) use ($request_data) {
                 $brand_id = $request_data['brand_id'];
                 $fuel_type = $request_data['fuel_type'];
                 $seat_type = $request_data['seat_type'];
@@ -72,7 +72,7 @@ class ItemController extends BaseController
     {
         try {
             $auth_user = Auth::user();
-            $request_data = $request->only('brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'price');
+            $request_data = $request->only('brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'transmission_type', 'price');
             $final_field = $request_data;
 
             $validator = Validator::make($request_data, [
@@ -82,6 +82,7 @@ class ItemController extends BaseController
                 'cc' => 'required|integer',
                 'fuel_type' => 'required|max:100',
                 'total_seat' => 'required|integer',
+                'transmission_type' => 'required|in:Manual,Matic',
                 'price' => 'required|regex:/^\d{1,15}(\.\d{1,3})?$/'
             ]);
 
@@ -140,7 +141,7 @@ class ItemController extends BaseController
     {
         try {
             $auth_user = Auth::user();
-            $request_data = $request->only('id', 'brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'price', 'photo', 'photo_removed');
+            $request_data = $request->only('id', 'brand_id', 'name', 'description', 'cc', 'fuel_type', 'total_seat', 'price', 'transmission_type', 'photo', 'photo_removed');
             $final_field = $request_data;
             $ruleValidation = [
                 'id' => 'required|exists:items,id',
@@ -150,6 +151,7 @@ class ItemController extends BaseController
                 'cc' => 'required|regex:/^\d{1,8}(\.\d{1,2})?$/',
                 'price' => 'required|regex:/^\d{1,15}(\.\d{1,3})?$/',
                 'fuel_type' => 'required|max:100',
+                'transmission_type' => 'required|in:Manual,Matic',
                 'photo_removed' => 'nullable|array',
                 'photo_removed.*' => 'nullable|string',
                 'total_seat' => 'required|integer'
