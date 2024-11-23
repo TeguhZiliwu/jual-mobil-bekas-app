@@ -20,6 +20,7 @@ export default defineConfig({
                 'resources/js/pages/transactions/payment.js',
                 'resources/js/pages/reports/sales.js',
                 'resources/js/pages/transactions/landing-page.js',
+                'resources/js/pages/transactions/history-transaction.js'
             ],
 
             refresh: true,

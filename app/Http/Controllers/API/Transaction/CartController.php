@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Transaction;
 
 use App\Http\Controllers\API\BaseController;
+use App\Models\Master\Cart;
 use App\Models\Master\Item;
 use App\Models\Transaction\Transaction;
 use Illuminate\Http\Request;
@@ -123,6 +124,47 @@ class CartController extends BaseController
             ]);
 
             $message = $result ? 'Submit data successfully!' : 'Something wrong when submitting the data! Please contact the administrator!';
+
+            return $this->sendResponse($result, $message);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    //create
+    public function remove_from_cart(Request $request)
+    {
+        try {
+            $auth_user = Auth::user();
+            $request_data = $request->only('item_id');
+            $final_field = $request_data;
+
+            $validator = Validator::make($request_data, [
+                'item_id' => 'required|exists:items,id'
+            ]);
+
+            $final_field['userid'] = $auth_user->userid;
+            $final_field['created_by'] = $auth_user->userid;
+            $final_field['created_at'] = now();
+
+            if ($validator->fails()) {
+                $message = 'Invalid data provided. Please review and try again.';
+                $message_type = 'warning';
+                $validation_message = $validator->errors();
+                return $this->sendResponse(null, $message, false, $message_type, $validation_message);
+            }
+
+            $exists = Cart::where('userid', $auth_user->userid)
+                ->where('item_id', $request_data["item_id"])
+                ->exists();
+
+            $result = true;
+            if ($exists) {
+                $result = (bool) Cart::where('item_id', $request_data["item_id"])
+                                     ->where('userid', $auth_user->userid)
+                                     ->delete();
+            }
+            $message = $result ? 'Car removed successfully from cart!' : 'Something wrong when removing from cart! Please contact the administrator!';
 
             return $this->sendResponse($result, $message);
         } catch (\Throwable $th) {

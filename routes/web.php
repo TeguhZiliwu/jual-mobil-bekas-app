@@ -149,6 +149,7 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('/', [CartController::class, 'get_cart']);
         Route::post('/buy', [CartController::class, 'buy']);
         Route::post('/upload', [CartController::class, 'upload_receipt']);
+        Route::post('/remove', [CartController::class, 'remove_from_cart']);
     });
 
     Route::group(['prefix' => 'history'], function () {

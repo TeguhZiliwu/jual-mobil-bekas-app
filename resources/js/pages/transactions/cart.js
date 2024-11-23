@@ -134,6 +134,7 @@ const loadData = async () => {
                         statuColor = "bg-success";
                         buttonAction = `<div class="d-grid gap-2 mb-4">
                                             <button class="btn btn-success-light btn-wave waves-effect waves-light action-buy" item-id="${item_id}" price="${price}" item-name="${item_name}"><i class="fa-solid fa-money-bill-1-wave"></i> Buy</button>
+                                            <button class="btn btn-danger-light btn-wave waves-effect waves-light action-remove" item-id="${item_id}" price="${price}" item-name="${item_name}"><i class="fa-solid fa-trash"></i> Remove</button>
                                         </div>`;
                     } else if (status == "PROCESSING") {
                         statuColor = "bg-warning";
@@ -239,6 +240,11 @@ const loadData = async () => {
                     modalPayment.show();
                     setBuyDetail(data);
                 });
+
+                $("button.action-remove").on("click", async function () {
+                    const item_id = $(this).attr("item-id");
+                    removeCart(item_id);
+                });
             } else {
                 let card = `<div class="card mb-4 text-center cart-list">
                                     <div class="card-body h-100"> 
@@ -322,6 +328,47 @@ const confirmBuy = async () => {
             showAlert("success", message, 15000);
             await loadData();
             modalPayment.hide();
+        }
+        else {
+            if (validation_message) {
+                let finalMessage = "";
+                let numberValidation = 1;
+                for (let key in validation_message) {
+                    if (validation_message.hasOwnProperty(key)) {
+                        finalMessage += `${numberValidation}. ${validation_message[key]} <br />`;
+                        numberValidation++;
+                    }
+                }
+                showAlert(message_type, finalMessage);
+            } else {
+                showAlert(message_type, message);
+            }
+        }
+    } catch (error) {
+        showError(error);
+    } finally {
+        window.setTimeout(function () {
+            hideLoading();
+        }, 300);
+    }
+};
+
+const removeCart = async (item_id) => {
+    try {
+        const url = "/api/cart/remove";
+
+        const param = {
+            item_id
+        };
+
+        showLoading();
+
+        const response = await callAPI(url, "POST", param);
+        const { data, success, message, message_type, validation_message } = await response;
+
+        if (success) {
+            showAlert("success", message, 15000);
+            await loadData();
         }
         else {
             if (validation_message) {
