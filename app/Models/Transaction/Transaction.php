@@ -23,6 +23,8 @@ class Transaction extends Model
         'payment_method',
         'status',
         'receipt_of_payment',
+        'is_delivery',
+        'delivery_address',
         'created_by',
         'created_at',
         'updated_by',

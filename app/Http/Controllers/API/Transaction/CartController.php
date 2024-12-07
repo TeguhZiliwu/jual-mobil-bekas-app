@@ -37,13 +37,15 @@ class CartController extends BaseController
     {
         try {
             $auth_user = Auth::user();
-            $request_data = $request->only('item_id', 'payment_method');
+            $request_data = $request->only('item_id', 'payment_method', 'is_delivery', 'delivery_address');
             $item_data = Item::where('id', $request_data["item_id"])->get();
             $final_field = $request_data;
             
             $validator = Validator::make($request_data, [
                 'item_id' => 'required|exists:items,id',
                 'payment_method' => 'required|in:Cash,Transfer',
+                'is_delivery' => 'required|boolean',
+                'delivery_address' => 'max:255',
             ]);
 
             $final_field['userid'] = $auth_user->userid;
@@ -51,6 +53,8 @@ class CartController extends BaseController
             $final_field['date'] = now();
             $final_field['price'] = $item_data->first()->price;
             $final_field['payment_method'] = $request_data["payment_method"];
+            $final_field['is_delivery'] = $request_data["is_delivery"];
+            $final_field['delivery_address'] = $request_data["delivery_address"];
             $final_field['status'] = "AWAITING PAYMENT";
             $final_field['created_by'] = $auth_user->userid;
             $final_field['created_at'] = now();

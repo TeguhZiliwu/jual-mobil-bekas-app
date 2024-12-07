@@ -313,10 +313,14 @@ const confirmBuy = async () => {
 
         const item_id = $("#btnConfirmBuy").attr("item-id");
         const payment_method = $(`input[name="paymentType"]:checked`).val();
+        const is_delivery = $(`input[name="deliveryOption"]:checked`).val();
+        const delivery_address = $(`#txtAddressToDelivery`).val();
 
         const param = {
             item_id,
-            payment_method
+            payment_method,
+            is_delivery: is_delivery === "Delivery to Address" ? true : false,
+            delivery_address
         };
 
         showLoading();
@@ -488,11 +492,22 @@ $("#btnSearch").on("click", async function () {
 $("#btnConfirmBuy").on("click", async function () {
     let valid = true;
     const payment_type = $(`input[name="paymentType"]:checked`).val();
+    const delivery_option = $(`input[name="deliveryOption"]:checked`).val();
+    const delivery_address = $(`#txtAddressToDelivery`).val();
 
     if (validation.includes(payment_type)) {
         showAlert("warning", "Please choose payment type!", 15000);
         valid = false;
     }
+    else if (validation.includes(delivery_option)) {
+        showAlert("warning", "Please choose delivery option!", 15000);
+        valid = false;
+    } else if (delivery_option === "Delivery to Address" && validation.includes(delivery_address)) {
+        showAlert("warning", "Please fill delivery address!", 15000);
+        valid = false;
+    }
+
+
 
     if (valid) {
         await confirmBuy();
@@ -530,6 +545,15 @@ $(`input[name="paymentType"]`).on("change", async function (e) {
         $("#labelCash").removeClass("d-none");
     } else if (value == "Transfer") {
         $("#labelTransfer").removeClass("d-none");
+    }
+});
+
+$(`input[name="deliveryOption"]`).on("change", async function (e) {
+    const value = $(this).val();
+    if (value == "Delivery to Address") {
+        $("#addressSection").removeClass("d-none");
+    } else {
+        $("#addressSection").addClass("d-none");
     }
 });
 

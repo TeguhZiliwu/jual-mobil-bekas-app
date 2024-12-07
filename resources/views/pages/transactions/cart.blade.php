@@ -52,6 +52,26 @@
                                                 </label>
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Delivery Options <span class="text-danger">*</span></label>                                            
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="deliveryOption" id="rbPickupFromShowRoom" value="Pickup from Showroom">
+                                                <label class="form-check-label" for="rbPickupFromShowRoom">
+                                                    Pickup from Showroom
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="deliveryOption" id="rbDeliveryToAddress" value="Delivery to Address">
+                                                <label class="form-check-label" for="rbDeliveryToAddress">
+                                                    Delivery to Address
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group d-none" id="addressSection">
+                                            <label for="txtAddressToDelivery" class="form-label">Address to Delivery <span class="text-danger">*</span></label>
+                                            <textarea class="form-control text-field" id="txtAddressToDelivery" placeholder="Enter Address to Deliver" autocomplete="off" maxlength="255"></textarea>
+                                            <span class="badge bg-primary float-end mt-2 counter-char">0/255</span>
+                                        </div>
                                         <p class="d-none label-payment-type" id="labelTransfer">Transfer to BCA Bank<br>
                                             Account Number: 324 445-4544<br>
                                         </p>
