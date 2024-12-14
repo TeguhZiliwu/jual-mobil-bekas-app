@@ -35,12 +35,12 @@ Route::middleware([RedirectIfAuthenticated::class])->group(function () {
     })->name('signup');
 });
 
-Route::get('/jual-mobil-bekas', function () {
+Route::get('/', function () {
     return view('landing-page');
 })->name('landing-page');
 
 Route::middleware([Authenticate::class])->group(function () {
-    Route::get('/', function () {
+    Route::get('/dashboard', function () {
         $totalIncomeCurrMonth = DB::table('transactions')
                     ->whereYear('date', date('Y'))
                     ->whereMonth('date', date('m'))
