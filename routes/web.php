@@ -36,7 +36,11 @@ Route::middleware([RedirectIfAuthenticated::class])->group(function () {
 });
 
 Route::get('/', function () {
-    return view('landing-page');
+    $result = DB::table("items AS A")->select('A.id', 'A.brand_id', 'D.name AS brand_name', 'A.status', 'A.name', 'A.description', 'A.cc', 'A.fuel_type', 'A.transmission_type', 'A.total_seat', 'A.price')->leftJoin('users AS B', 'A.created_by', '=', 'B.userid')->leftJoin('users AS C', 'A.updated_by', '=', 'C.userid')->join('brands AS D', 'A.brand_id', '=', 'D.id')->where('status', 'OPEN')->get();
+    
+    $result_photo = DB::table("item_photos AS A")->select('A.id', 'A.item_id', 'A.name')->get();
+    
+    return view('landing-page', ['items' => $result, 'photos' => $result_photo]);
 })->name('landing-page');
 
 Route::middleware([Authenticate::class])->group(function () {

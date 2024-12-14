@@ -41,7 +41,7 @@ const signIn = async () => {
         if (success) {
             localStorage.setItem("token", data.token);
             showAlert("success", message, 15000);
-            window.location.href = `/`;
+            window.location.href = `/dashboard`;
         }
         else {
             if (validation_message) {

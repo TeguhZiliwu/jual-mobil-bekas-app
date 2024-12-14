@@ -1,4 +1,4 @@
-import { initInputMask, validateForm, showAlert, showConfirmBox, showError, generateDataTable, generateDropdownOption, showLoading, hideLoading, callAPI } from "../../global/common";
+import { initInputMask, validateForm, showAlert, showConfirmBox, showError, generateDataTable, generateDropdownOption, showLoading, hideLoading, formatToRupiah, callAPI } from "../../global/common";
 
 var swiper = new Swiper(".pagination-dynamic", {
     pagination: {
@@ -157,6 +157,10 @@ const getRatingReview = async () => {
 
 //initial load
 $(document).ready(async function () {
+    document.querySelectorAll('.transmission-price').forEach((el) => {
+        const value = el.getAttribute('data-value');
+        el.textContent = formatToRupiah(value);
+    });
     await getRatingReview();
 });
 //end initial load
