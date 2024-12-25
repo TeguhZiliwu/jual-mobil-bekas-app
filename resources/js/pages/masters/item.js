@@ -152,6 +152,7 @@ const generateMainTable = () => {
                 { data: "fuel_type" },
                 { data: "total_seat" },
                 { data: "transmission_type" },
+                { data: "year" },
                 {
                     data: "status",
                     render: function (data, type, row, meta) {
@@ -344,6 +345,7 @@ const submit = async () => {
         const total_seat = $("#ddSeat").val();
         const transmission_type = $("#ddTransmissionType").val();
         const price = $("#txtPrice").inputmask('unmaskedvalue');
+        const year = $("#txtYear").val();
         const formData = new FormData();
 
         formData.append("id", selectedId);
@@ -354,6 +356,7 @@ const submit = async () => {
         formData.append("fuel_type", fuel_type);
         formData.append("transmission_type", transmission_type);
         formData.append("total_seat", total_seat);
+        formData.append("year", year);
         formData.append("price", validation.includes(parseFloat(price.replace(',', '.'))) ? 0 : parseFloat(price.replace(',', '.')));
 
         for (let i = 0; i < photoRemoved.length; i++) {
@@ -497,7 +500,7 @@ $("#mainTable").on("click", `button[action="edit"]`, async function () {
     const data = mainTable.row(row).data();
     const validation = [null, "", NaN, undefined];
     isEdit = true;
-    const { id, name, brand_id, description, fuel_type, total_seat, transmission_type, price, cc } = data;
+    const { id, name, brand_id, description, fuel_type, total_seat, transmission_type, price, cc, year } = data;
     formTab.show();
 
     disableForm(false);
@@ -509,6 +512,7 @@ $("#mainTable").on("click", `button[action="edit"]`, async function () {
     $("#ddTransmissionType").val(transmission_type).trigger("change");
     $("#txtPrice").val(price.toString().replace('.', ',')).trigger("keyup").trigger("input");
     $("#txtCC").val(cc.toString().replace('.', ',')).trigger("keyup").trigger("input");
+    $("#txtYear").val(year).trigger("change");
 
     // if (!validation.includes(photo)) {
     //     imageFile.addFile(`../assets/images/items/${photo}`);

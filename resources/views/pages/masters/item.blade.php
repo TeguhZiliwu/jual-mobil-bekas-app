@@ -68,6 +68,7 @@
                                     <th>Fuel Type</th>
                                     <th>Total Seat</th>
                                     <th>Transmission Type</th>
+                                    <th>Year</th>
                                     <th>Status</th>
                                     <th>Price</th>
                                     <th>Created By</th>
@@ -147,6 +148,14 @@
                         <div class="form-group">
                             <label for="txtPrice" class="form-label">Price <span class="text-danger">*</span></label>
                             <input type="text" class="form-control text-field price-field margin-price-set-up" id="txtPrice" placeholder="Enter Price" autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-4">
+                        <div class="form-group">
+                            <label for="txtYear" class="form-label">Year <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control text-field" id="txtYear" placeholder="Enter Year" autocomplete="off" />
                         </div>
                     </div>
                 </div>

@@ -142,65 +142,65 @@
             <section class="section " id="list-car">
                 <div class="container text-center">
                     <div class="row">
-                    </div>
-                    @foreach ($items as $data)
-                        <div class="col-md-6 col-lg-6 col-xl-4 col-sm-6 car-card-section">
-                            <div class="card">
-                                <div class="card-body h-100">
-                                    <div class="pro-img-box">
-                                        @php
-                                            // Filter photos to get those that match the current item's id
-                                            $photosForItem = $photos->filter(function ($photo) use ($data) {
-                                                return $photo->item_id === $data->id;
-                                            });
-                                        @endphp
-                                        <div id="carouselCarForSale_{{ $data->id }}" class="carousel slide" data-bs-ride="carousel">
-                                            <div class="carousel-indicators">
-                                                @if ($photosForItem->isNotEmpty())
-                                                    @foreach ($photosForItem as $photo)
-                                                        <button type="button" data-bs-target="#carouselCarForSale_{{ $data->id }}" data-bs-slide-to="{{ $loop->index }}" class="{{ $loop->index === 0 ? 'active' : '' }}" aria-label="Slide {{ $loop->index }}"></button>
-                                                    @endforeach
-                                                @endif
+                        @foreach ($items as $data)
+                            <div class="col-md-6 col-lg-6 col-xl-4 col-sm-6 car-card-section">
+                                <div class="card">
+                                    <div class="card-body h-100">
+                                        <div class="pro-img-box">
+                                            @php
+                                                // Filter photos to get those that match the current item's id
+                                                $photosForItem = $photos->filter(function ($photo) use ($data) {
+                                                    return $photo->item_id === $data->id;
+                                                });
+                                            @endphp
+                                            <div id="carouselCarForSale_{{ $data->id }}" class="carousel slide" data-bs-ride="carousel">
+                                                <div class="carousel-indicators">
+                                                    @if ($photosForItem->isNotEmpty())
+                                                        @foreach ($photosForItem as $photo)
+                                                            <button type="button" data-bs-target="#carouselCarForSale_{{ $data->id }}" data-bs-slide-to="{{ $loop->index }}" class="{{ $loop->index === 0 ? 'active' : '' }}" aria-label="Slide {{ $loop->index }}"></button>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                                <div class="carousel-inner">
+                                                    @if ($photosForItem->isNotEmpty())
+                                                        @foreach ($photosForItem as $photo)
+                                                            <div class="carousel-item {{ $loop->index === 0 ? 'active' : '' }}">
+                                                                <img style="width: 120px; aspect-ratio: 3/2; object-fit: contain;" src="../assets/images/items/{{ $photo->name }}" class="d-block w-100" alt="{{ $photo->name }}" loading="lazy">
+                                                            </div>
+                                                        @endforeach
+                                                    @endif
+    
+                                                </div>
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselCarForSale_{{ $data->id }}" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Previous</span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carouselCarForSale_{{ $data->id }}" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Next</span>
+                                                </button>
                                             </div>
-                                            <div class="carousel-inner">
-                                                @if ($photosForItem->isNotEmpty())
-                                                    @foreach ($photosForItem as $photo)
-                                                        <div class="carousel-item {{ $loop->index === 0 ? 'active' : '' }}">
-                                                            <img src="../assets/images/items/{{ $photo->name }}" class="d-block w-100" alt="{{ $photo->name }}" loading="lazy">
-                                                        </div>
-                                                    @endforeach
-                                                @endif
-
+                                            <a href="{{ route('transaction.car-for-sale') }}" class="adtocart" action="addcart" item-id="{{ $data->id }}">
+                                                <i class="las la-shopping-cart"></i>
+                                            </a>
+                                        </div>
+                                        <div class="text-center pt-3">
+                                            <h3 class="h6 mb-2 mt-4 fw-bold text-uppercase">{{ $data->name }}</h3>
+                                            <h3 class="h6 mb-2 fw-normal fs-13 text-base">{{ $data->description }}</h3>
+                                            <div class="d-flex justify-content-between mt-3">
+                                                <span><i class="fa-solid fa-gas-pump"></i> {{ $data->fuel_type }}</span>
+                                                <span><i class="fa-solid fa-person-seat-reclined"></i> ${{ $data->total_seat }} Seats</span>
+                                                <span><i class="fa-solid fa-gears"></i> {{ $data->transmission_type }}</span>
                                             </div>
-                                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselCarForSale_{{ $data->id }}" data-bs-slide="prev">
-                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Previous</span>
-                                            </button>
-                                            <button class="carousel-control-next" type="button" data-bs-target="#carouselCarForSale_{{ $data->id }}" data-bs-slide="next">
-                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Next</span>
-                                            </button>
+                                            <h4 class="h5 mb-0 mt-2 text-center fw-bold text-danger">
+                                                <span class="transmission-price" data-value="{{ $data->price }}"></span>
+                                            </h4>
                                         </div>
-                                        <a href="{{ route('transaction.car-for-sale') }}" class="adtocart" action="addcart" item-id="{{ $data->id }}">
-                                            <i class="las la-shopping-cart"></i>
-                                        </a>
-                                    </div>
-                                    <div class="text-center pt-3">
-                                        <h3 class="h6 mb-2 mt-4 fw-bold text-uppercase">{{ $data->name }}</h3>
-                                        <h3 class="h6 mb-2 fw-normal fs-13 text-base">{{ $data->description }}</h3>
-                                        <div class="d-flex justify-content-between mt-3">
-                                            <span><i class="fa-solid fa-gas-pump"></i> {{ $data->fuel_type }}</span>
-                                            <span><i class="fa-solid fa-person-seat-reclined"></i> ${{ $data->total_seat }} Seats</span>
-                                            <span><i class="fa-solid fa-gears"></i> {{ $data->transmission_type }}</span>
-                                        </div>
-                                        <h4 class="h5 mb-0 mt-2 text-center fw-bold text-danger">
-                                            <span class="transmission-price" data-value="{{ $data->price }}"></span>
-                                        </h4>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
             </section>
             <section class="section " id="about">

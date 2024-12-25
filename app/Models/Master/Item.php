@@ -22,6 +22,8 @@ class Item extends Model
         'cc',
         'fuel_type',
         'total_seat',
+        'transmission_type',
+        'year',
         'price',
         'status',
         'created_by',
